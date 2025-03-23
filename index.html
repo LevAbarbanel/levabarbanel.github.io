@@ -3,2166 +3,357 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>איקס עיגול על סטרואידים</title>
+    <title>אכלתם תחת</title>
     <link rel="icon" type="image/x-icon" href="./images/tic.png">
-
     <style>
-        :root {
-            /* Primary colors - green-gray theme */
-            --primary-color: #7a8c85; /* Main green-gray for X markers */
-            --secondary-color: #6b7d75; /* Secondary green-gray for O markers */
-            /* Background colors */
-            --background-color: #2c3330; /* Dark green-gray background (replacing purple) */
-            --surface-color: #3c4641; /* Green-gray surface color for game board */
-            --surface-variant: #4a5752; /* Slightly lighter surface variant */
-            /* Text colors */
-            --text-color: #e0e5e3; /* Light green-gray text */
-            --text-secondary: #b5bfba; /* Medium light green-gray text */
-            /* Gradient colors */
-            --start-gradient-1: #2c3330; /* Dark green-gray */
-            --start-gradient-2: #3c4641; /* Medium dark green-gray */
-            /* UI elements */
-            --outline-variant: #7a897f; /* Medium green-gray for outlines */
-        }
-
-        body.dark-theme {
-            /* Dark theme colors - deeper green-gray tones */
-            --primary-color: #8b9d95; /* Lighter green-gray in dark mode */
-            --secondary-color: #7a8c85; /* Main green-gray in dark mode */
-            /* Dark backgrounds */
-            --background-color: #1a201e; /* Very dark green-gray background */
-            --surface-color: #212724; /* Dark green-gray surface */
-            --surface-variant: #2c332f; /* Medium dark green-gray surface */
-            /* Text colors for dark mode */
-            --text-color: #e0e5e3; /* Light green-gray text */
-            --text-secondary: #b5bfba; /* Medium light green-gray text */
-            /* Dark gradient colors */
-            --start-gradient-1: #1a201e; /* Very dark green-gray */
-            --start-gradient-2: #2c332f; /* Dark green-gray */
-            /* UI elements for dark mode */
-            --outline-variant: #5f7570; /* Medium green-gray for outlines */
-        }
-
-        /* Specific style overrides for the X and O markers */
-        .x-marker::before,
-        .x-marker::after {
-            background-color: #7a8c85 !important; /* Green-gray X */
-        }
-
-        .x-marker.winning::before,
-        .x-marker.winning::after {
-            background-color: #8b9d95 !important; /* Lighter green-gray X when winning */
-        }
-
-        .o-marker {
-            border-color: #6b7d75 !important; /* Green-gray O */
-        }
-
-            .o-marker.winning {
-                border-color: #7a8c85 !important; /* Lighter green-gray O when winning */
-            }
-
-        /* Game background gradient */
-        .start-screen {
-            background: linear-gradient(135deg, #2c3330, #3c4641) !important;
-        }
-
-        /* Override animation colors */
-        @keyframes color-shift {
-            0% {
-                background-color: #5f7570 !important;
-            }
-
-            100% {
-                background-color: #7a8c85 !important;
-            }
-        }
-
-        @keyframes color-shift-o {
-            0% {
-                border-color: #6b7d75 !important;
-            }
-
-            100% {
-                border-color: #7a8c85 !important;
-            }
-        }
-
-        /* Update player markers colors */
-        .player-x {
-            background: radial-gradient(circle, #7a8c85, #5f7570) !important;
-            box-shadow: 0 0 10px #5f7570 !important;
-        }
-
-        .player-o {
-            background: radial-gradient(circle, #7a8c85, #6b7d75) !important;
-            box-shadow: 0 0 10px #6b7d75 !important;
-        }
-
-        body:not(.dark-theme) .theme-toggle {
-            background-color: #ffffff;
-            color: #FFB300;
-            border: 2px solid rgba(255, 255, 255, 0.8);
-        }
-
-            body:not(.dark-theme) .theme-toggle:hover {
-                background-color: #f8f8f8;
-                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-                transform: translateY(-2px);
-            }
-
-        /* Dark theme styling */
-        body.dark-theme .theme-toggle {
-            background-color: #2d2d2d;
-            color: #E0E0E0;
-            border: 2px solid rgba(80, 80, 80, 0.8);
-        }
-
-            body.dark-theme .theme-toggle:hover {
-                background-color: #3d3d3d;
-                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-                transform: translateY(-2px);
-            }
-
-        /* Updated dark theme colors for the start screen */
-        body.dark-theme .start-screen {
-            background: linear-gradient(135deg, #1A237E, #4A148C);
-        }
-
-        /* Create a subtle animation for the theme toggle */
-        @keyframes rotate-toggle {
-            0% {
-                transform: rotate(0deg);
-            }
-
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
-        .theme-toggle:active {
-            animation: rotate-toggle 0.5s ease;
-        }
-
-        /* Make the theme toggle in game screen look consistent */
-        #game-theme-toggle {
-            position: absolute;
-            top: 20px;
-            left: 20px; /* Changed from right to left for RTL */
-        }
-
-        /* Improve dark theme for animated cells */
-        body.dark-theme .animated-cell {
-            background-color: rgba(45, 45, 45, 0.8);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-        }
-
-        .theme-toggle {
-            position: absolute;
-            top: 20px;
-            left: 20px; /* Changed from right to left for RTL */
-            background: none;
-            border: none;
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            z-index: 1010;
-            font-size: 24px;
-            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
-            outline: none;
-        }
-        /* Update the start screen background gradient for dark mode */
-        .start-screen {
-            background: linear-gradient(135deg, var(--start-gradient-1), var(--start-gradient-2));
-        }
-
-        /* More comprehensive text color rules for dark mode */
-        body.dark-theme {
-            color: var(--text-color);
-        }
-
-            body.dark-theme .game-title,
-            body.dark-theme .game-subtitle,
-            body.dark-theme .score-label,
-            body.dark-theme .option-group label,
-            body.dark-theme .game-description h2,
-            body.dark-theme .game-description li,
-            body.dark-theme .dialog-title,
-            body.dark-theme .dialog-message,
-            body.dark-theme .dialog-score-title,
-            body.dark-theme .score-label,
-            body.dark-theme .round-indicator,
-            body.dark-theme .player-indicator,
-            body.dark-theme .timer-text {
-                color: var(--text-color);
-            }
-
-            /* Ensure all text in the start screen is properly colored */
-            body.dark-theme .start-title,
-            body.dark-theme .start-container,
-            body.dark-theme .game-description,
-            body.dark-theme .option-group {
-                color: var(--text-color);
-            }
-
-            /* Update mode buttons for better visibility in dark mode */
-            body.dark-theme .mode-button {
-                color: var(--primary-color);
-                border-color: var(--primary-color);
-            }
-
-                body.dark-theme .mode-button.active {
-                    background-color: var(--primary-color);
-                    color: var(--surface-color);
-                }
-
-            /* Add more styles for dark mode components */
-            body.dark-theme .start-container,
-            body.dark-theme .game-container,
-            body.dark-theme .score-board,
-            body.dark-theme .game-info,
-            body.dark-theme .player-indicator,
-            body.dark-theme .game-over-dialog {
-                background-color: var(--surface-color);
-            }
-
-            body.dark-theme .cell {
-                background-color: rgba(40, 40, 40, 0.7);
-                border-color: rgba(180, 180, 180, 0.2);
-            }
-
-                body.dark-theme .cell:hover {
-                    background-color: rgba(60, 60, 60, 0.9);
-                }
-
-            body.dark-theme .score-item,
-            body.dark-theme .option-group,
-            body.dark-theme .game-description {
-                background-color: rgba(80, 80, 80, 0.2);
-            }
-
-            body.dark-theme .dialog-score {
-                background-color: var(--surface-variant);
-            }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        body, html {
             margin: 0;
             padding: 0;
-            background-color: var(--background-color);
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            overflow-x: hidden;
-            direction: rtl; /* Added for RTL support */
-            text-align: right; /* Added for RTL support */
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #000;
+            font-family: Arial, sans-serif;
         }
 
         .container {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            flex-grow: 1;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .game-title {
-            font-size: 28px;
-            font-weight: bold;
-            color: var(--primary-color);
-            margin: 0;
-        }
-
-        .game-subtitle {
-            font-size: 16px;
-            color: var(--primary-color);
-            opacity: 0.8;
-            margin-top: 8px;
-            animation: color-cycle 3s infinite alternate;
-        }
-
-        @keyframes color-cycle {
-            0% {
-                color: var(--primary-color);
-            }
-
-            100% {
-                color: var(--secondary-color);
-            }
-        }
-
-        .score-board {
-            background-color: var(--surface-variant);
-            border-radius: 24px;
-            padding: 16px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .round-indicator {
-            text-align: center;
-            font-size: 18px;
-            font-weight: bold;
-            color: var(--primary-color);
-            margin-bottom: 10px;
-        }
-
-        .scores {
-            display: flex;
-            justify-content: space-around;
-            text-align: center;
-        }
-
-        .score-item {
-            padding: 10px;
-            background-color: rgba(0, 0, 0, 0.05);
-            border-radius: 16px;
-        }
-
-        .score-label {
-            font-size: 14px;
-            color: var(--outline-variant);
-            margin-bottom: 5px;
-        }
-
-        .score-value {
-            font-size: 24px;
-            font-weight: bold;
-        }
-
-        .x-score {
-            color: var(--primary-color);
-        }
-
-        .draw-score {
-            color: #546E7A;
-        }
-
-        .o-score {
-            color: var(--secondary-color);
-        }
-
-        .game-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .cell.oldest-marker {
             position: relative;
-            overflow: visible;
-        }
-
-            .cell.oldest-marker::before {
-                content: "";
-                position: absolute;
-                width: 100%;
-                height: 100%;
-                border: 3px dashed #FF5722;
-                border-radius: 16px;
-                box-sizing: border-box;
-                animation: flash-border 1.5s infinite;
-                pointer-events: none;
-                z-index: 5;
-            }
-
-        @keyframes flash-border {
-            0%, 100% {
-                opacity: 0.2;
-            }
-
-            50% {
-                opacity: 1;
-            }
-        }
-
-        .player-indicator {
-            display: flex;
-            align-items: center;
-            background-color: var(--surface-variant);
-            opacity: 0.9;
-            padding: 8px 16px;
-            border-radius: 24px;
-        }
-
-        .player-marker {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-right: 8px; /* Changed from margin-left to margin-right for RTL */
-            font-size: 22px;
-            font-weight: bold;
-            color: white;
-            position: relative;
-            animation: pulse 1.5s infinite alternate;
-        }
-
-        @keyframes pulse {
-            0% {
-                transform: scale(0.9);
-            }
-
-            100% {
-                transform: scale(1.1);
-            }
-        }
-
-        .player-x {
-            background: radial-gradient(circle, #7C4DFF, #5E35B1);
-            box-shadow: 0 0 10px #5E35B1;
-        }
-
-        .player-o {
-            background: radial-gradient(circle, #FF80AB, #EC407A);
-            box-shadow: 0 0 10px #EC407A;
-        }
-
-        .timer-container {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start; /* Changed from flex-end to flex-start for RTL */
-        }
-
-        .timer-display {
-            display: flex;
-            align-items: center;
-            margin-bottom: 4px;
-        }
-
-        .timer-icon {
-            margin-left: 4px; /* Changed from margin-right to margin-left for RTL */
-        }
-
-        .timer-bar {
-            width: 120px;
-            height: 6px;
-            background-color: #e0e0e0;
-            border-radius: 3px;
-            overflow: hidden;
-        }
-
-        .timer-progress {
+            width: 100%;
             height: 100%;
-            background-color: #4CAF50;
-            border-radius: 3px;
-            transition: width 0.05s linear;
-            float: right; /* Added for RTL progress bar */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
         }
 
-        .timer-warning {
-            background-color: #FF9800;
-        }
-
-        .timer-danger {
-            background-color: #F44336;
-            animation: pulse-width 0.5s infinite alternate;
-        }
-
-        @keyframes pulse-width {
-            0% {
-                transform: scaleY(0.85);
-            }
-
-            100% {
-                transform: scaleY(1.15);
-            }
-        }
-
-        .game-board {
-            aspect-ratio: 1/1;
-            background: var(--surface-variant);
-            border-radius: 24px;
-            overflow: hidden;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
-            border: 2px solid rgba(121, 116, 126, 0.5);
-            padding: 25px; /* Increased from 12px to 20px to match grid gap */
-            margin-bottom: 20px;
+        .video-container {
             position: relative;
-        }
-
-        .board-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            grid-template-rows: repeat(3, 1fr);
-            gap: 12px;
-            height: 100%;
-        }
-
-        .cell {
-            background-color: rgba(255, 255, 255, 0.7);
-            border-radius: 16px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            border: 1px solid rgba(121, 116, 126, 0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-            .cell:hover {
-                background-color: rgba(255, 255, 255, 0.9);
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            }
-
-            .cell.x-cell.winning {
-                background-color: rgba(122, 140, 133, 0.3);
-                border: 2px solid var(--primary-color);
-                box-shadow: 0 0 8px var(--primary-color);
-                animation: win-pulse 1s infinite alternate;
-            }
-
-            .cell.o-cell.winning {
-                background-color: rgba(107, 125, 117, 0.3);
-                border: 2px solid var(--secondary-color);
-                box-shadow: 0 0 8px var(--secondary-color);
-                animation: win-pulse 1s infinite alternate;
-            }
-
-        @keyframes win-pulse {
-            0% {
-                transform: scale(0.95);
-            }
-
-            100% {
-                transform: scale(1.05);
-            }
-        }
-
-        .cell.last-moved {
-            animation: highlight-pulse 0.6s 1;
-        }
-
-        @keyframes highlight-pulse {
-            0% {
-                transform: scale(1);
-            }
-
-            50% {
-                transform: scale(1.2);
-            }
-
-            100% {
-                transform: scale(1);
-            }
-        }
-
-        @keyframes power-down-pulse {
-            0% {
-                opacity: 1;
-                transform: scale(1);
-            }
-
-            30% {
-                opacity: 0.4;
-                transform: scale(0.9);
-            }
-
-            60% {
-                opacity: 0.7;
-                transform: scale(0.95);
-            }
-
-            100% {
-                opacity: 0.5;
-                transform: scale(0.92);
-            }
-        }
-
-        .x-marker, .o-marker {
-            width: 60px;
-            height: 60px;
-            position: relative;
-            transform: scale(0);
-            animation: place-marker 0.3s forwards cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        @keyframes place-marker {
-            0% {
-                transform: scale(0.6);
-            }
-
-            70% {
-                transform: scale(1.1);
-            }
-
-            100% {
-                transform: scale(1);
-            }
-        }
-
-        .x-marker {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-            .x-marker::before,
-            .x-marker::after {
-                content: '';
-                position: absolute;
-                width: 80%;
-                height: 10%;
-                background-color: #5E35B1;
-                border-radius: 5px;
-            }
-
-            .x-marker::before {
-                transform: rotate(45deg);
-            }
-
-            .x-marker::after {
-                transform: rotate(-45deg);
-            }
-
-            .x-marker.winning::before,
-            .x-marker.winning::after {
-                background-color: var(--primary-color);
-                box-shadow: 0 0 5px var(--primary-color);
-                animation: color-shift 1s infinite alternate;
-            }
-
-        @keyframes color-shift {
-            0% {
-                background-color: var(--primary-color);
-            }
-
-            100% {
-                background-color: #8b9d95;
-            }
-        }
-
-        .o-marker {
-            border: 8px solid var(--secondary-color);
-            border-radius: 50%;
-        }
-
-            .o-marker.winning {
-                border-color: var(--secondary-color);
-                box-shadow: 0 0 5px var(--secondary-color);
-                animation: color-shift-o 1s infinite alternate;
-            }
-
-        @keyframes color-shift-o {
-            0% {
-                border-color: var(--secondary-color);
-            }
-
-            100% {
-                border-color: #7a8c85;
-            }
-        }
-
-        .winning-line {
-            position: absolute;
-            background-color: var(--primary-color);
-            opacity: 0.7;
-            transform-origin: center;
-            z-index: 10;
-            box-shadow: 0 0 10px var(--primary-color);
-            opacity: 0;
-            animation: line-appear 0.8s forwards;
-        }
-
-        @keyframes line-appear {
-            0% {
-                opacity: 0;
-            }
-
-            100% {
-                opacity: 0.7;
-            }
-        }
-
-        .game-over {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 100;
-        }
-
-        .game-over-dialog {
-            background-color: white;
-            border-radius: 24px;
-            padding: 24px;
-            width: 90%;
-            max-width: 400px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-            transform: scale(0);
-            animation: dialog-appear 0.5s forwards cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        @keyframes dialog-appear {
-            0% {
-                transform: scale(0.5);
-            }
-
-            100% {
-                transform: scale(1);
-            }
-        }
-
-        .dialog-header {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .trophy-icon {
-            font-size: 32px;
-            margin-left: 10px; /* Changed from margin-right for RTL */
-        }
-
-        .x-win {
-            color: #5E35B1;
-        }
-
-        .o-win {
-            color: #EC407A;
-        }
-
-        .dialog-title {
-            font-size: 24px;
-            font-weight: bold;
-            text-align: center;
-        }
-
-        .dialog-message {
-            text-align: center;
-            margin-bottom: 20px;
-            font-size: 18px;
-        }
-
-        .dialog-score {
-            background-color: rgba(122, 140, 133, 0.3);
-            border-radius: 16px;
-            padding: 16px;
-            margin-bottom: 20px;
-        }
-
-        .dialog-score-title {
-            text-align: center;
-            font-weight: bold;
-            margin-bottom: 10px;
-            color: var(--primary-color);
-        }
-
-        .dialog-score-content {
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-        }
-
-        .dialog-score-item {
-            text-align: center;
-        }
-
-        .dialog-actions {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-            flex-direction: row-reverse; /* Added for RTL buttons */
-        }
-
-        .btn {
-            padding: 10px 20px;
+            width: 375px; /* iPhone X width */
+            height: 812px; /* iPhone X height */
+            max-height: 90vh;
+            background-color: #000;
             border-radius: 20px;
-            border: none;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.2s;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+            z-index: 10;
         }
 
-        .btn-primary {
-            background-color: var(--primary-color);
-            color: white;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        }
-
-            .btn-primary:hover {
-                background-color: #512DA8;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-            }
-
-        .btn-secondary {
-            background-color: transparent;
-            color: var(--primary-color);
-        }
-
-            .btn-secondary:hover {
-                background-color: rgba(0, 0, 0, 0.05);
-            }
-
-        /* Start Screen Styles */
-        .start-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
+        video {
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, #673AB7, #E91E63);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
+            object-fit: cover;
+            display: none;
         }
 
-        .start-container {
-            background-color: white;
-            border-radius: 24px;
-            padding: 30px;
-            width: 90%;
-            max-width: 500px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            text-align: center;
-            animation: pop-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            video.active {
+                display: block;
+            }
+
+        .emoji {
+            position: absolute;
+            font-size: 60px;
+            z-index: 1;
+            opacity: 0;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+            filter: drop-shadow(0 0 10px rgba(255, 255, 0, 0.6));
+            animation: float 8s linear infinite, fade 4s ease-in-out infinite;
         }
 
-        @keyframes pop-in {
+        @keyframes float {
             0% {
-                transform: scale(0.8);
+                transform: translateY(100vh) translateX(0);
+            }
+
+            100% {
+                transform: translateY(-100px) translateX(calc(100vw * var(--random-x)));
+            }
+        }
+
+        @keyframes fade {
+            0%, 100% {
                 opacity: 0;
             }
 
-            100% {
-                transform: scale(1);
-                opacity: 1;
+            50% {
+                opacity: 0.9;
             }
         }
 
-        .start-title {
-            font-size: 32px;
-            color: var(--primary-color);
-            margin-bottom: 20px;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .animated-board {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            grid-template-rows: repeat(3, 1fr);
-            gap: 10px;
-            width: 200px;
-            height: 200px;
-            margin: 0 auto 20px;
-        }
-
-        .animated-cell {
-            background-color: rgba(255, 255, 255, 0.8);
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            animation: pulse-cell 3s infinite alternate;
-            animation-delay: calc(var(--i, 0) * 0.2s);
-        }
-
-            .animated-cell:nth-child(1) {
-                --i: 1;
-            }
-
-            .animated-cell:nth-child(2) {
-                --i: 2;
-            }
-
-            .animated-cell:nth-child(3) {
-                --i: 3;
-            }
-
-            .animated-cell:nth-child(4) {
-                --i: 6;
-            }
-
-            .animated-cell:nth-child(5) {
-                --i: 5;
-            }
-
-            .animated-cell:nth-child(6) {
-                --i: 4;
-            }
-
-            .animated-cell:nth-child(7) {
-                --i: 7;
-            }
-
-            .animated-cell:nth-child(8) {
-                --i: 8;
-            }
-
-            .animated-cell:nth-child(9) {
-                --i: 9;
-            }
-
-        @keyframes pulse-cell {
-            0% {
-                transform: scale(0.95);
-            }
-
-            100% {
-                transform: scale(1);
-            }
-        }
-
-       .game-description {
-            text-align: right; /* Changed from left to right for RTL */
-            margin: 20px 0;
-            padding: 15px;
-            background-color: rgba(122, 140, 133, 0.1); /* Green-gray with low opacity */
-            border-radius: 12px;
-        }
-
-            .game-description h2 {
-                font-size: 20px;
-                color: var(--primary-color); /* Use primary color from green-gray theme */
-                margin-top: 0;
-            }
-
-            .game-description ul {
-                margin-bottom: 0;
-                padding-right: 20px; /* Changed from padding-left to padding-right for RTL */
-                padding-left: 0; /* Added to remove default left padding */
-            }
-
-            .game-description li {
-                margin-bottom: 8px;
-                line-height: 1.4;
-                color: var(--text-secondary); /* Use secondary text color for better readability */
-            }
-
-        /* Game Options Styles */
-        .game-options {
-            margin: 20px 0;
-        }
-
-        .option-group {
-            margin-bottom: 15px;
-            text-align: right; /* Changed from left to right for RTL */
-            background-color: rgba(122, 140, 133, 0.3);
-            padding: 12px 15px;
-            border-radius: 12px;
-        }
-
-            .option-group label {
-                display: block;
-                margin-bottom: 8px;
-                font-weight: bold;
-                color: var(--primary-color);
-            }
-
-        .slider {
-            width: 100%;
-            height: 10px;
-            -webkit-appearance: none;
-            appearance: none;
-            background: #ffffff;
-            border-radius: 5px;
-            outline: none;
-            direction: ltr; /* Keep slider direction ltr */
-        }
-
-            .slider::-webkit-slider-thumb {
-                -webkit-appearance: none;
-                appearance: none;
-                width: 20px;
-                height: 20px;
-                border-radius: 50%;
-                background: var(--primary-color);
-                cursor: pointer;
-                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-            }
-
-            .slider::-moz-range-thumb {
-                width: 20px;
-                height: 20px;
-                border-radius: 50%;
-                background: #ffffff;
-                cursor: pointer;
-                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-                border: none;
-            }
-
-        .mode-buttons {
-            display: flex;
-            gap: 10px;
-        }
-
-        .mode-button {
-            flex: 1;
-            padding: 10px;
-            border: 2px solid var(--primary-color);
-            background: transparent;
-            color: var(--primary-color);
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-            .mode-button:hover {
-                background-color: rgba(103, 58, 183, 0.1);
-            }
-
-            .mode-button.active {
-                background-color: var(--primary-color);
-                color: white;
-            }
-
-        .start-button {
-            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
-            color: white;
-            border: none;
-            border-radius: 50px;
-            padding: 15px 40px;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            margin-top: 10px;
-        }
-
-            .start-button:hover {
-                transform: translateY(-3px);
-                box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
-            }
-
-            .start-button:active {
-                transform: translateY(0);
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            }
-
-        .confetti {
-            position: fixed;
+        .message-overlay {
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 30;
+            opacity: 0;
             pointer-events: none;
-            z-index: 90;
+            transition: opacity 1s ease;
         }
 
-        .confetti-piece {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            background-color: #5E35B1;
-            top: -10px;
-            opacity: 0;
+            .message-overlay.visible {
+                opacity: 1;
+                pointer-events: auto;
+            }
+
+        .message-text {
+            color: white;
+            font-size: 24px;
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.7);
+        }
+
+        .evil-laugh {
+            font-size: 40px;
+            margin-top: 20px;
+            animation: shake 0.5s infinite;
+        }
+
+        @keyframes shake {
+            0%, 100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-5px);
+            }
+
+            75% {
+                transform: translateX(5px);
+            }
+        }
+
+        .controls {
+            margin-top: 20px;
+            z-index: 20;
+        }
+
+        button {
+            background-color: #fff;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            margin: 0 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+            button:hover {
+                background-color: #ddd;
+            }
+
+        .progress-container {
+            width: 375px;
+            height: 5px;
+            background-color: rgba(255, 255, 255, 0.2);
+            margin-top: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+            z-index: 20;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0;
+            background-color: #fff;
+            transition: width 0.1s linear;
+        }
+
+        .video-info {
+            color: white;
+            margin-top: 10px;
+            font-size: 14px;
+            z-index: 20;
         }
     </style>
 </head>
 <body>
-    <!-- Start Screen -->
-    <div class="start-screen" id="start-screen">
-        <div class="start-container">
-            <h1 class="start-title">האיקס עיגול על סטרואידים<br /> של לב</h1>
-            <div class="animated-board">
-                <div class="animated-cell"><div class="x-marker"></div></div>
-                <div class="animated-cell"></div>
-                <div class="animated-cell"><div class="o-marker"></div></div>
-                <div class="animated-cell"></div>
-                <div class="animated-cell"><div class="x-marker"></div></div>
-                <div class="animated-cell"><div class="o-marker"></div></div>
-                <div class="animated-cell"><div class="o-marker"></div></div>
-                <div class="animated-cell"></div>
-                <div class="animated-cell"><div class="x-marker"></div></div>
+    <div class="container">
+        <div class="video-container">
+            <video id="video1" class="active" playsinline>
+                <source src="/images/1.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <video id="video2" playsinline>
+                <source src="/images/2.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <video id="video3" playsinline>
+                <source src="/images/3.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+
+            <div class="message-overlay" id="messageOverlay">
+                <div class="message-text">אני תמיד יודע מה קורה...</div>
+                <div class="evil-laugh">צוחק מרושע... 😈</div>
             </div>
-            <div class="game-description">
-                <h2>חוקים: </h2>
-                <ul>
-                    <li>כל שחקן יכול לשים עד 3 צורות על הלוח בו זמנית</li>
-                    <li>מתי ששמים את הצורה הרביעית, הצורה הישנה ביותר נמחקת</li>
-                    <li>לכל מהלך יש זמן מוגבל של שניות</li>
-                    <li>הראשון שמחבר 3 צורות מנצח!</li>
-                </ul>
-            </div>
-            
-            <div class="game-options">
-                <div class="option-group">
-                    <label for="time-slider">קבע זמן למהלך: <span id="time-value">3</span> שניות</label>
-                    <input type="range" id="time-slider" min="1" max="10" value="3" class="slider">
-                </div>
-                
-                <div class="option-group">
-                    <label>סוג משחק: </label>
-                    <div class="mode-buttons">
-                        <button id="mode-1v1" class="mode-button active">אחד מול אחד (יש לי חברים)</button>
-                        <button id="mode-cpu" class="mode-button">אחד מול מחשב (חסר חברים)</button>
-                    </div>
-                </div>
-            </div>
-            
-            <button class="start-button" id="start-game-button">שחק</button>
+        </div>
+
+        <div class="controls">
+            <button id="playPauseBtn">Play</button>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+        <div class="video-info">
+            <span id="currentVideo">Video 1 of 3</span> - <span id="currentTime">0:00</span> / <span id="duration">0:00</span>
         </div>
     </div>
-
-    <!-- Game Screen (hidden initially) -->
-    <div class="container" id="game-container" style="display: none;">
-        <div class="header">
-            <h1 class="game-title">איקס עיגול על סטרואידים</h1>
-            <p class="game-subtitle">!?רק שלושה מהלכים לכל אחד! שמעתם</p>
-        </div>
-        
-        <div class="score-board">
-            <div class="round-indicator">סיבוב <span id="round-number">1</span></div>
-            <div class="scores">
-                <div class="score-item">
-                    <div class="score-label">שחקן איקס</div>
-                    <div class="score-value x-score" id="x-score">0</div>
-                </div>
-                <div class="score-item">
-                    <div class="score-label">תיקו</div>
-                    <div class="score-value draw-score" id="draw-score">0</div>
-                </div>
-                <div class="score-item">
-                    <div class="score-label">שחקן עיגול</div>
-                    <div class="score-value o-score" id="o-score">0</div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="game-info">
-            <div class="player-indicator">
-                <span>ㅤתור:</span>
-                <div class="player-marker player-x" id="player-indicator">X</div>
-
-
-            </div>
-            
-            <div class="timer-container">
-                <div class="timer-display">
-                    <span class="timer-icon">⏱</span>
-                    <span id="timer-text">3.0 שניות</span>
-                </div>
-                <div class="timer-bar">
-                    <div class="timer-progress" id="timer-progress"></div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="game-board" id="game-board">
-            <div class="board-grid" id="board-grid">
-                <!-- Cells will be generated by JavaScript -->
-            </div>
-        </div>
-    </div>
-
-    <!-- Game over dialog (hidden initially) -->
-    <div class="game-over" id="game-over" style="display: none;">
-        <div class="game-over-dialog">
-            <div class="dialog-header">
-                <span class="trophy-icon" id="trophy-icon">🏆</span>
-                <h2 class="dialog-title" id="dialog-title">!איקס ניצח</h2>
-            </div>
-            
-            <p class="dialog-message" id="dialog-message">שחקן איקס ניצח</p>
-            
-            <div class="dialog-score">
-                <div class="dialog-score-title">ניקוד</div>
-                <div class="dialog-score-content">
-                    <div class="dialog-score-item">
-                        <div class="score-label">X</div>
-                        <div class="score-value x-score" id="dialog-x-score">0</div>
-                    </div>
-                    <div class="dialog-score-item">:</div>
-                    <div class="dialog-score-item">
-                        <div class="score-label">תיקו</div>
-                        <div class="score-value draw-score" id="dialog-draw-score">0</div>
-                    </div>
-                    <div class="dialog-score-item">:</div>
-                    <div class="dialog-score-item">
-                        <div class="score-label">O</div>
-                        <div class="score-value o-score" id="dialog-o-score">0</div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="dialog-actions">
-                <button class="btn btn-secondary" id="close-dialog">סגור</button>
-                <button class="btn btn-primary" id="play-again">שחק שוב</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="confetti" id="confetti-container"></div>
 
     <script>
-        // Game state
-        const PLAYER = {
-            X: 'X',
-            O: 'O',
-            NONE: 'NONE'
-        };
-        
-        const GAME_STATE = {
-            PLAYING: 'PLAYING',
-            X_WINS: 'X_WINS',
-            O_WINS: 'O_WINS',
-            DRAW: 'DRAW',
-            GAME_OVER: 'GAME_OVER'
-        };
-        
-        // Game configuration
-        let TIME_PER_MOVE = 3000; // 3 seconds per move (default)
-        const MAX_MARKERS_PER_PLAYER = 3;
-        let gameMode = '1v1'; // Default game mode
-        
-        // Game variables
-        let currentPlayer = PLAYER.X;
-        let gameState = GAME_STATE.PLAYING;
-        let board = Array(9).fill(PLAYER.NONE);
-        let lastMovedIndex = -1;
-        let removedMarkerIndex = -1;
-        let xMoves = [];
-        let oMoves = [];
-        let totalMoves = 0;
-        let remainingTime = TIME_PER_MOVE;
-        let winner = null;
-        let timeoutPlayer = null;
-        let xScore = 0;
-        let oScore = 0;
-        let drawCount = 0;
-        let gameRound = 1;
-        let winningLine = null;
-        let timerInterval = null;
-        let computerThinking = false;
-        
-        // DOM Elements
-        const boardGrid = document.getElementById('board-grid');
-        const playerIndicator = document.getElementById('player-indicator');
-        const timerText = document.getElementById('timer-text');
-        const timerProgress = document.getElementById('timer-progress');
-        const gameOverDialog = document.getElementById('game-over');
-        const dialogTitle = document.getElementById('dialog-title');
-        const dialogMessage = document.getElementById('dialog-message');
-        const trophyIcon = document.getElementById('trophy-icon');
-        const roundNumber = document.getElementById('round-number');
-        const xScoreElement = document.getElementById('x-score');
-        const oScoreElement = document.getElementById('o-score');
-        const drawScoreElement = document.getElementById('draw-score');
-        const dialogXScore = document.getElementById('dialog-x-score');
-        const dialogOScore = document.getElementById('dialog-o-score');
-        const dialogDrawScore = document.getElementById('dialog-draw-score');
-        const playAgainButton = document.getElementById('play-again');
-        const closeDialogButton = document.getElementById('close-dialog');
-        const confettiContainer = document.getElementById('confetti-container');
-        // Add these lines right after the variables declaration section
-        const timeSlider = document.getElementById('time-slider');
-        const timeValue = document.getElementById('time-value');
-
-        // Add event listener for the slider
-        timeSlider.addEventListener('input', function () {
-            const selectedTime = parseInt(this.value);
-            timeValue.textContent = selectedTime;
-            TIME_PER_MOVE = selectedTime * 1000; // Convert to milliseconds
-
-            // If the game is already in progress, update the remaining time
-            if (timerInterval) {
-                remainingTime = TIME_PER_MOVE;
-                const seconds = Math.max(0, remainingTime / 1000).toFixed(1);
-                timerText.textContent = `${seconds}s`;
-                timerProgress.style.width = '100%';
-                timerProgress.className = 'timer-progress';
-            }
-        });
-        // Add mode button event listeners after your existing variables
-        const mode1v1Button = document.getElementById('mode-1v1');
-        const modeCpuButton = document.getElementById('mode-cpu');
-
-        mode1v1Button.addEventListener('click', () => {
-            gameMode = '1v1';
-            mode1v1Button.classList.add('active');
-            modeCpuButton.classList.remove('active');
-        });
-
-        modeCpuButton.addEventListener('click', () => {
-            gameMode = 'cpu';
-            modeCpuButton.classList.add('active');
-            mode1v1Button.classList.remove('active');
-        });
-
-// Modify the placeMarker function to handle computer moves
-// Find this section in the placeMarker function:
-// Continue game
-
-        // Add the computer AI functions
-        function makeComputerMove() {
-            // If there's already a winner, don't make a move
-            if (gameState !== GAME_STATE.PLAYING) return;
-
-            const bestMove = findBestMove();
-            makeMove(bestMove);
-        }
-
-        function findBestMove() {
-            // This is a special Tic Tac Toe variant with only 3 markers per player
-            // We need to adapt the minimax algorithm for this case
-
-            // First, if computer can win with current markers, do that
-            const immediateWin = findImmediateWin(PLAYER.O);
-            if (immediateWin !== -1) return immediateWin;
-
-            // Second, if player can win with their next move, block them
-            const blockMove = findImmediateWin(PLAYER.X);
-            if (blockMove !== -1) return blockMove;
-
-            // Third, if computer has 3 markers, find the best one to move
-            if (oMoves.length >= MAX_MARKERS_PER_PLAYER) {
-                return findBestReplacementMove();
-            }
-
-            // Otherwise, use minimax to find the best new placement
-            let bestScore = -Infinity;
-            let bestMove = -1;
-
-            // Try each empty cell
-            for (let i = 0; i < 9; i++) {
-                if (board[i] === PLAYER.NONE) {
-                    // Make temporary move
-                    board[i] = PLAYER.O;
-                    oMoves.push(i);
-
-                    // Get score for this move
-                    const score = minimax(board, 0, false);
-
-                    // Undo move
-                    board[i] = PLAYER.NONE;
-                    oMoves.pop();
-
-                    // Update best move if needed
-                    if (score > bestScore) {
-                        bestScore = score;
-                        bestMove = i;
-                    }
-                }
-            }
-
-            return bestMove !== -1 ? bestMove : getRandomEmptyCell();
-        }
-
-        function findImmediateWin(player) {
-            const playerMoves = player === PLAYER.X ? xMoves : oMoves;
-
-            // If player has less than 2 markers, they can't win on next move
-            if (playerMoves.length < 2) return -1;
-
-            const winPatterns = [
-                [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
-                [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
-                [0, 4, 8], [2, 4, 6]             // Diagonals
+        document.addEventListener('DOMContentLoaded', function () {
+            // Video elements
+            const videos = [
+                document.getElementById('video1'),
+                document.getElementById('video2'),
+                document.getElementById('video3')
             ];
 
-            for (const pattern of winPatterns) {
-                const [a, b, c] = pattern;
+            // Controls
+            const playPauseBtn = document.getElementById('playPauseBtn');
+            const progressBar = document.getElementById('progressBar');
+            const currentVideoText = document.getElementById('currentVideo');
+            const currentTimeText = document.getElementById('currentTime');
+            const durationText = document.getElementById('duration');
 
-                // Check if player can win by placing at position a
-                if (board[a] === PLAYER.NONE && board[b] === player && board[c] === player) {
-                    return a;
-                }
+            let currentVideoIndex = 0;
+            let isPlaying = false;
 
-                // Check if player can win by placing at position b
-                if (board[a] === player && board[b] === PLAYER.NONE && board[c] === player) {
-                    return b;
-                }
+            // Emoji types for background
+            const emojis = ['😂', '🤣', '😅', '😆', '😹'];
+            const container = document.querySelector('.container');
 
-                // Check if player can win by placing at position c
-                if (board[a] === player && board[b] === player && board[c] === PLAYER.NONE) {
-                    return c;
-                }
-            }
+            // Function to create emojis
+            function createEmoji() {
+                if (!isPlaying) return;
 
-            return -1;
-        }
+                const emoji = document.createElement('div');
+                emoji.classList.add('emoji');
+                emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                emoji.style.left = `${Math.random() * 100}vw`;
+                emoji.style.setProperty('--random-x', Math.random() * 2 - 1);
+                emoji.style.animationDuration = `${Math.random() * 8 + 5}s`;
+                emoji.style.animationDelay = `${Math.random() * 2}s`;
 
-        function findBestReplacementMove() {
-            // When computer already has 3 markers, need to decide which one to replace
+                container.appendChild(emoji);
 
-            let bestScore = -Infinity;
-            let bestOldPos = -1;
-            let bestNewPos = -1;
-
-            // Try removing each existing marker
-            for (let i = 0; i < oMoves.length; i++) {
-                const oldPos = oMoves[i];
-                const oldBoard = [...board];
-
-                // Temporarily remove this marker
-                oldBoard[oldPos] = PLAYER.NONE;
-
-                // Try placing a new marker in each empty cell
-                for (let j = 0; j < 9; j++) {
-                    if (oldBoard[j] === PLAYER.NONE) {
-                        // Make temporary move
-                        oldBoard[j] = PLAYER.O;
-
-                        // Check if this is a winning move
-                        if (isWinningMove(oldBoard, PLAYER.O)) {
-                            return j; // Return immediately if we found a winning move
-                        }
-
-                        // Calculate score for this configuration
-                        const score = evaluateBoard(oldBoard);
-
-                        // Update best move if needed
-                        if (score > bestScore) {
-                            bestScore = score;
-                            bestOldPos = oldPos;
-                            bestNewPos = j;
-                        }
-
-                        // Undo temp move
-                        oldBoard[j] = PLAYER.NONE;
-                    }
-                }
-            }
-
-            return bestNewPos !== -1 ? bestNewPos : getRandomEmptyCell();
-        }
-
-        function minimax(board, depth, isMaximizing) {
-            // This is a simplified minimax for the special 3-marker variant
-
-            // Check terminal states
-            if (isWinningBoard(board, PLAYER.O)) {
-                return 10 - depth; // Computer wins
-            }
-
-            if (isWinningBoard(board, PLAYER.X)) {
-                return depth - 10; // Human wins
-            }
-
-            // Limit depth to keep it efficient
-            if (depth > 3) {
-                return evaluateBoard(board);
-            }
-
-            if (isMaximizing) {
-                let bestScore = -Infinity;
-
-                // Try each empty cell
-                for (let i = 0; i < 9; i++) {
-                    if (board[i] === PLAYER.NONE) {
-                        board[i] = PLAYER.O;
-                        const score = minimax(board, depth + 1, false);
-                        board[i] = PLAYER.NONE;
-                        bestScore = Math.max(score, bestScore);
-                    }
-                }
-
-                return bestScore;
-            } else {
-                let bestScore = Infinity;
-
-                // Try each empty cell
-                for (let i = 0; i < 9; i++) {
-                    if (board[i] === PLAYER.NONE) {
-                        board[i] = PLAYER.X;
-                        const score = minimax(board, depth + 1, true);
-                        board[i] = PLAYER.NONE;
-                        bestScore = Math.min(score, bestScore);
-                    }
-                }
-
-                return bestScore;
-            }
-        }
-        function highlightOldestMarker() {
-            // Remove any existing highlight
-            const allMarkers = document.querySelectorAll('.x-marker, .o-marker');
-            allMarkers.forEach(marker => {
-                // Reset any existing animations
-                marker.style.animation = '';
-                marker.style.opacity = '1';
-            });
-
-            // Apply power-down effect immediately to both players' oldest markers
-            if (xMoves.length >= MAX_MARKERS_PER_PLAYER) {
-                const oldestPos = xMoves[0];
-                const oldestCell = boardGrid.children[oldestPos];
-                const marker = oldestCell.querySelector('.x-marker');
-                if (marker) {
-                    marker.style.animation = 'power-down-pulse 1s infinite alternate';
-                }
-            }
-
-            if (oMoves.length >= MAX_MARKERS_PER_PLAYER) {
-                const oldestPos = oMoves[0];
-                const oldestCell = boardGrid.children[oldestPos];
-                const marker = oldestCell.querySelector('.o-marker');
-                if (marker) {
-                    marker.style.animation = 'power-down-pulse 1s infinite alternate';
-                }
-            }
-        }
-        function isWinningBoard(board, player) {
-            const winPatterns = [
-                [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
-                [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
-                [0, 4, 8], [2, 4, 6]             // Diagonals
-            ];
-
-            for (const pattern of winPatterns) {
-                const [a, b, c] = pattern;
-                if (board[a] === player && board[b] === player && board[c] === player) {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        function isWinningMove(board, player) {
-            return isWinningBoard(board, player);
-        }
-
-        function evaluateBoard(board) {
-            // Heuristic evaluation function
-            // Prefer center and corners
-            const centerValue = board[4] === PLAYER.O ? 3 : (board[4] === PLAYER.X ? -3 : 0);
-
-            // Corners are valuable
-            const corners = [0, 2, 6, 8];
-            let cornerValue = 0;
-
-            for (const corner of corners) {
-                if (board[corner] === PLAYER.O) cornerValue += 2;
-                else if (board[corner] === PLAYER.X) cornerValue -= 2;
-            }
-
-            // Evaluate two-in-a-row situations
-            let twoInARowValue = 0;
-            const winPatterns = [
-                [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
-                [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
-                [0, 4, 8], [2, 4, 6]             // Diagonals
-            ];
-
-            for (const pattern of winPatterns) {
-                const [a, b, c] = pattern;
-                const line = [board[a], board[b], board[c]];
-
-                // Count markers in this line
-                const oCount = line.filter(cell => cell === PLAYER.O).length;
-                const xCount = line.filter(cell => cell === PLAYER.X).length;
-                const emptyCount = line.filter(cell => cell === PLAYER.NONE).length;
-
-                // Two of our markers with an empty cell is good
-                if (oCount === 2 && emptyCount === 1) twoInARowValue += 5;
-
-                // Two of opponent's markers with an empty cell is bad
-                if (xCount === 2 && emptyCount === 1) twoInARowValue -= 5;
-            }
-
-            return centerValue + cornerValue + twoInARowValue;
-        }
-
-        function getRandomEmptyCell() {
-            const emptyCells = [];
-
-            for (let i = 0; i < 9; i++) {
-                if (board[i] === PLAYER.NONE) {
-                    emptyCells.push(i);
-                }
-            }
-
-            if (emptyCells.length === 0) return -1;
-
-            return emptyCells[Math.floor(Math.random() * emptyCells.length)];
-        }
-
-       
-        // Update the Start Game button event listener
-       
-        // Initialize the game
-        function initGame() {
-            createBoard();
-            startTimer();
-            updateUI();
-            addGameThemeToggle(); // Add theme toggle to game screen
-        }
-        
-        // Create the game board
-        function createBoard() {
-            boardGrid.innerHTML = '';
-            
-            for (let i = 0; i < 9; i++) {
-                const cell = document.createElement('div');
-                cell.className = 'cell';
-                cell.dataset.index = i;
-                cell.addEventListener('click', () => makeMove(i));
-                boardGrid.appendChild(cell);
-            }
-        }
-        
-        // Start the timer
-        function startTimer() {
-            clearInterval(timerInterval);
-            remainingTime = TIME_PER_MOVE;
-            
-            timerInterval = setInterval(() => {
-                if (computerThinking && currentPlayer === PLAYER.O) {
-                    // Don't decrease time for computer's turn
-                    return;
-                }
-                
-                remainingTime -= 50;
-                
-                // Update timer UI
-                const seconds = Math.max(0, remainingTime / 1000).toFixed(1);
-                timerText.textContent = `${seconds}s`;
-                
-                timerProgress.style.width = `${(remainingTime / TIME_PER_MOVE) * 100}%`;
-                
-                // Change color based on time remaining
-                if (remainingTime < TIME_PER_MOVE * 0.33) {
-                    timerProgress.className = 'timer-progress timer-danger';
-                    timerText.style.color = 'red';
-                } else if (remainingTime < TIME_PER_MOVE * 0.66) {
-                    timerProgress.className = 'timer-progress timer-warning';
-                    timerText.style.color = '';
-                } else {
-                    timerProgress.className = 'timer-progress';
-                    timerText.style.color = '';
-                }
-                
-                // Check for timeout
-                if (remainingTime <= 0) {
-                    clearInterval(timerInterval);
-                    timeoutPlayer = currentPlayer;
-                    gameState = GAME_STATE.GAME_OVER;
-                    showGameOverDialog();
-                }
-            }, 50);
-        }
-        
-        // Make a move
-        function makeMove(position) {
-            if (board[position] !== PLAYER.NONE || gameState !== GAME_STATE.PLAYING) {
-                return;
-            }
-
-            // Reset any previous marker animations
-            const allMarkers = document.querySelectorAll('.x-marker, .o-marker');
-            allMarkers.forEach(marker => {
-                marker.style.animation = '';
-                marker.style.opacity = '1';
-            });
-
-            const currentPlayerMoves = currentPlayer === PLAYER.X ? xMoves : oMoves;
-
-            // If player already has maximum markers on board, remove the oldest one
-            if (currentPlayerMoves.length >= MAX_MARKERS_PER_PLAYER) {
-                const oldestPosition = currentPlayerMoves.shift();
-                removedMarkerIndex = oldestPosition;
-                board[oldestPosition] = PLAYER.NONE;
-
-                // Remove marker with animation
-                const oldCell = boardGrid.children[oldestPosition];
-                const marker = oldCell.querySelector('.x-marker, .o-marker');
-                if (marker) {
-                    // Cancel any existing animation and start removal animation
-                    marker.style.animation = '';
-                    marker.style.transform = 'scale(0)';
-                    setTimeout(() => {
-                        if (oldCell.contains(marker)) {
-                            oldCell.removeChild(marker);
-                        }
-                    }, 200);
-                }
-
-                // Small delay before placing new marker
+                // Remove emoji after animation completes
                 setTimeout(() => {
-                    placeMarker(position);
-                }, 200);
-            } else {
-                placeMarker(position);
+                    emoji.remove();
+                }, 10000);
             }
-        }
-        
-        // Place a marker on the board
-        function placeMarker(position) {
-            const currentPlayerMoves = currentPlayer === PLAYER.X ? xMoves : oMoves;
-            
-            // Update board state
-            board[position] = currentPlayer;
-            currentPlayerMoves.push(position);
-            lastMovedIndex = position;
-            totalMoves++;
-            
-            // Add marker to UI
-            const cell = boardGrid.children[position];
-            const marker = document.createElement('div');
-            marker.className = currentPlayer === PLAYER.X ? 'x-marker' : 'o-marker';
-            cell.appendChild(marker);
-            cell.classList.add(currentPlayer === PLAYER.X ? 'x-cell' : 'o-cell');
-            cell.classList.add('last-moved');
-            
-            // Remove last-moved class after animation
-            setTimeout(() => {
-                cell.classList.remove('last-moved');
-            }, 600);
-            
-            // Check for winner
-            if (checkWinner()) {
-                gameState = currentPlayer === PLAYER.X ? GAME_STATE.X_WINS : GAME_STATE.O_WINS;
-                winner = currentPlayer;
-                
-                // Update score
-                if (currentPlayer === PLAYER.X) {
-                    xScore++;
-                } else {
-                    oScore++;
-                }
-                
-                // Draw winning line
-                drawWinningLine();
-                
-                // Show winning cells
-                winningLine.forEach(index => {
-                    const winCell = boardGrid.children[index];
-                    winCell.classList.add('winning');
-                    const winMarker = winCell.querySelector('.x-marker, .o-marker');
-                    if (winMarker) {
-                        winMarker.classList.add('winning');
+
+            // Create emojis at intervals
+            let emojiInterval;
+
+            function startEmojiAnimation() {
+                if (emojiInterval) clearInterval(emojiInterval);
+                emojiInterval = setInterval(createEmoji, 500);
+            }
+
+            function stopEmojiAnimation() {
+                clearInterval(emojiInterval);
+                // Remove all existing emojis
+                document.querySelectorAll('.emoji').forEach(emoji => emoji.remove());
+            }
+
+            // Function to play current video
+            function playCurrentVideo() {
+                videos.forEach((video, index) => {
+                    if (index === currentVideoIndex) {
+                        video.classList.add('active');
+                        if (isPlaying) {
+                            video.play().catch(e => console.error("Playback error:", e));
+                        }
+                    } else {
+                        video.classList.remove('active');
+                        video.pause();
+                        video.currentTime = 0;
                     }
                 });
-                
-                // Show game over dialog after a short delay
-                setTimeout(showGameOverDialog, 800);
-                
-                // Stop timer
-                clearInterval(timerInterval);
-            }
-            // Check for draw - in this special game type, a draw happens when moves exceed a large number
-            else if (totalMoves >= 50) {
-                gameState = GAME_STATE.DRAW;
-                drawCount++;
-                showGameOverDialog();
-                clearInterval(timerInterval);
-            }
-            // Continue game
-            else {
-                // Switch player
-                currentPlayer = currentPlayer === PLAYER.X ? PLAYER.O : PLAYER.X;
-                startTimer();
-                updateUI();
 
-                // Add this code to handle computer's turn
-                if (gameMode === 'cpu' && currentPlayer === PLAYER.O) {
-                    computerThinking = true;
-                    // Give a slight delay to make it feel like the computer is "thinking"
-                    setTimeout(() => {
-                        makeComputerMove();
-                        computerThinking = false;
-                    }, 500);
+                currentVideoText.textContent = `Video ${currentVideoIndex + 1} of ${videos.length}`;
+                updateDuration();
+            }
+
+            // Function to update progress bar
+            function updateProgress() {
+                const video = videos[currentVideoIndex];
+                if (video.duration) {
+                    const progressPercent = (video.currentTime / video.duration) * 100;
+                    progressBar.style.width = `${progressPercent}%`;
+
+                    // Update current time display
+                    const minutes = Math.floor(video.currentTime / 60);
+                    const seconds = Math.floor(video.currentTime % 60).toString().padStart(2, '0');
+                    currentTimeText.textContent = `${minutes}:${seconds}`;
                 }
             }
 
-        }
-        
-        // Check for winner
-        function checkWinner() {
-            const winPatterns = [
-                [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
-                [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
-                [0, 4, 8], [2, 4, 6]             // Diagonals
-            ];
-            
-            for (const pattern of winPatterns) {
-                const [a, b, c] = pattern;
-                if (board[a] !== PLAYER.NONE && board[a] === board[b] && board[a] === board[c]) {
-                    winningLine = pattern;
-                    return true;
+            // Function to update duration display
+            function updateDuration() {
+                const video = videos[currentVideoIndex];
+                if (video.duration && !isNaN(video.duration)) {
+                    const minutes = Math.floor(video.duration / 60);
+                    const seconds = Math.floor(video.duration % 60).toString().padStart(2, '0');
+                    durationText.textContent = `${minutes}:${seconds}`;
+                } else {
+                    durationText.textContent = "0:00";
+                    // Try again after a short delay
+                    setTimeout(updateDuration, 100);
                 }
             }
-            
-            return false;
-        }
-        function addThemeToggle() {
-            // Create theme toggle button
-            const themeToggle = document.createElement('button');
-            themeToggle.className = 'theme-toggle';
-            themeToggle.id = 'theme-toggle';
-            themeToggle.innerHTML = document.body.classList.contains('dark-theme') ? '🌙' : '☀️';
-            themeToggle.setAttribute('aria-label', 'Toggle dark mode');
-            themeToggle.setAttribute('title', document.body.classList.contains('dark-theme') ? 'Switch to light mode' : 'Switch to dark mode');
 
-            // Add to the start container
-            const startContainer = document.querySelector('.start-container');
-            startContainer.insertBefore(themeToggle, startContainer.firstChild);
+            // Play/Pause button
+            playPauseBtn.addEventListener('click', function () {
+                isPlaying = !isPlaying;
+                playPauseBtn.textContent = isPlaying ? 'Pause' : 'Play';
 
-            // Add event listener
-            themeToggle.addEventListener('click', toggleTheme);
-        }
-
-        window.addEventListener('DOMContentLoaded', initTheme);
-
-        function toggleTheme() {
-            const themeToggle = document.getElementById('theme-toggle');
-            const gameThemeToggle = document.getElementById('game-theme-toggle');
-
-            if (document.body.classList.contains('dark-theme')) {
-                // Switch to light theme
-                document.body.classList.remove('dark-theme');
-                if (themeToggle) {
-                    themeToggle.innerHTML = '☀️';
-                    themeToggle.setAttribute('title', 'Switch to dark mode');
+                if (isPlaying) {
+                    videos[currentVideoIndex].play();
+                    startEmojiAnimation();
+                } else {
+                    videos[currentVideoIndex].pause();
+                    stopEmojiAnimation();
                 }
-                if (gameThemeToggle) {
-                    gameThemeToggle.innerHTML = '☀️';
-                    gameThemeToggle.setAttribute('title', 'Switch to dark mode');
-                }
-                localStorage.setItem('theme', 'light');
-            } else {
-                // Switch to dark theme
-                document.body.classList.add('dark-theme');
-                if (themeToggle) {
-                    themeToggle.innerHTML = '🌙';
-                    themeToggle.setAttribute('title', 'Switch to light mode');
-                }
-                if (gameThemeToggle) {
-                    gameThemeToggle.innerHTML = '🌙';
-                    gameThemeToggle.setAttribute('title', 'Switch to light mode');
-                }
-                localStorage.setItem('theme', 'dark');
-            }
-        }
-        function addGameThemeToggle() {
-            // Remove existing toggle if any
-            const existingToggle = document.getElementById('game-theme-toggle');
-            if (existingToggle) {
-                existingToggle.remove();
-            }
-
-            // Create theme toggle button for game screen
-            const gameThemeToggle = document.createElement('button');
-            gameThemeToggle.className = 'theme-toggle';
-            gameThemeToggle.id = 'game-theme-toggle';
-            gameThemeToggle.innerHTML = document.body.classList.contains('dark-theme') ? '🌙' : '☀️';
-            gameThemeToggle.setAttribute('aria-label', 'Toggle dark mode');
-            gameThemeToggle.setAttribute('title', document.body.classList.contains('dark-theme') ? 'Switch to light mode' : 'Switch to dark mode');
-
-            // Add to the game container
-            const gameContainer = document.getElementById('game-container');
-            gameContainer.appendChild(gameThemeToggle);
-
-            // Add event listener
-            gameThemeToggle.addEventListener('click', toggleTheme);
-        }
-
-        // Update the theme variables to get a better dark color palette
-        document.documentElement.style.setProperty('--start-gradient-1', '#1A237E');
-        document.documentElement.style.setProperty('--start-gradient-2', '#4A148C');
-        // Add dark theme initialization to the window onload
-        // Call this function at the beginning of your script
-        function initTheme() {
-            const savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'dark') {
-                document.body.classList.add('dark-theme');
-            }
-
-            // Add the toggle button
-            addThemeToggle();
-        }
-        
-        // Draw winning line
-      
-        // Draw winning line
-        function drawWinningLine() {
-            if (!winningLine) return;
-
-            const boardElement = document.getElementById('game-board');
-            const line = document.createElement('div');
-            line.className = 'winning-line';
-
-            const cellWidth = boardGrid.children[0].offsetWidth;
-            const cellHeight = boardGrid.children[0].offsetHeight;
-
-            // Determine line position and rotation based on winning pattern
-            let startX, startY, length, angle;
-
-            const [a, b, c] = winningLine;
-
-            // Row win - no change needed for RTL
-            if (Math.floor(a / 3) === Math.floor(b / 3) && Math.floor(a / 3) === Math.floor(c / 3)) {
-                const row = Math.floor(a / 3);
-                startX = 0;
-                startY = row * cellHeight + cellHeight / 2;
-                length = boardElement.offsetWidth - 24; // Account for padding
-                angle = 0;
-            }
-            // Column win - for RTL, columns count from right to left
-            else if (a % 3 === b % 3 && a % 3 === c % 3) {
-                const col = a % 3;
-                // For RTL, we need to adjust the column position
-                startX = (2 - col) * cellWidth + cellWidth / 2; // 2 - col reverses the column index (0→2, 1→1, 2→0)
-                startY = 0;
-                length = boardElement.offsetHeight - 24; // Account for padding
-                angle = 90;
-            }
-            // Diagonal win (top-right to bottom-left in RTL)
-            else if ((a === 0 && c === 8) || (a === 8 && c === 0)) {
-                startX = boardElement.offsetWidth - 24;
-                startY = 0;
-                length = Math.sqrt(Math.pow(boardElement.offsetWidth - 24, 2) + Math.pow(boardElement.offsetHeight - 24, 2));
-                angle = 135;
-            }
-            // Diagonal win (top-left to bottom-right in RTL)
-            else if ((a === 2 && c === 6) || (a === 6 && c === 2)) {
-                startX = 0;
-                startY = 0;
-                length = Math.sqrt(Math.pow(boardElement.offsetWidth - 24, 2) + Math.pow(boardElement.offsetHeight - 24, 2));
-                angle = 45;
-            }
-
-            // Set line style
-            // Set line style
-            line.style.width = `${length}px`;
-            line.style.height = `8px`;
-            line.style.borderRadius = '4px';
-            line.style.position = 'absolute';
-            line.style.backgroundColor = winner === PLAYER.X ? 'var(--primary-color)' : 'var(--secondary-color)';
-            line.style.boxShadow = `0 0 10px ${winner === PLAYER.X ? 'var(--primary-color)' : 'var(--secondary-color)'}`;
-            line.style.opacity = '0.7';
-            line.style.top = `${startY - 4}px`; // Center the line (height/2)
-            line.style.left = `${startX}px`;
-            line.style.transformOrigin = 'left center';
-            line.style.transform = `rotate(${angle}deg)`;
-
-            boardElement.appendChild(line);
-        }
-        // Show game over dialog
-        function showGameOverDialog() {
-            // Update dialog content
-            if (timeoutPlayer) {
-                dialogTitle.textContent = "נגמר הזמן!";
-                dialogMessage.textContent = `לשחקן ${timeoutPlayer} נגמר הזמן!`;
-                trophyIcon.textContent = "⏱️";
-                trophyIcon.className = "trophy-icon";
-            } else if (gameState === GAME_STATE.DRAW) {
-                dialogTitle.textContent = "תיקו תיקו";
-                dialogMessage.textContent = "מספר מהלכים מקסימלי";
-                trophyIcon.textContent = "🤝";
-                trophyIcon.className = "trophy-icon";
-            } else if (gameState === GAME_STATE.X_WINS) {
-                dialogTitle.textContent = "איקס ניצח!";
-                dialogMessage.textContent = "איקס ניצח את המשחק!";
-                trophyIcon.textContent = "🏆";
-                trophyIcon.className = "trophy-icon x-win";
-                createConfetti("#5E35B1");
-            } else if (gameState === GAME_STATE.O_WINS) {
-                dialogTitle.textContent = "עיגול ניצח!";
-                dialogMessage.textContent = "עיגול ניצח את המשחק!";
-                trophyIcon.textContent = "🏆";
-                trophyIcon.className = "trophy-icon o-win";
-                createConfetti("#EC407A");
-            }
-            
-            // Update scores in dialog
-            dialogXScore.textContent = xScore;
-            dialogOScore.textContent = oScore;
-            dialogDrawScore.textContent = drawCount;
-            
-            // Show dialog
-            gameOverDialog.style.display = "flex";
-        }
-        
-        // Create confetti effect
-        function createConfetti(color) {
-            confettiContainer.innerHTML = '';
-            
-            for (let i = 0; i < 100; i++) {
-                const confetti = document.createElement('div');
-                confetti.className = 'confetti-piece';
-                
-                // Random properties
-                const size = Math.random() * 10 + 5;
-                confetti.style.width = `${size}px`;
-                confetti.style.height = `${size}px`;
-                confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
-                
-                // Random colors
-                const colors = [color, '#FFD700', '#4CAF50', '#2196F3'];
-                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                
-                // Random position
-                confetti.style.left = `${Math.random() * 100}%`;
-                
-                // Random animation
-                const duration = Math.random() * 3 + 2;
-                const delay = Math.random() * 2;
-                
-                confetti.style.animation = `fall ${duration}s ${delay}s forwards`;
-                
-                // Add keyframe animation dynamically
-                const styleSheet = document.styleSheets[0];
-                const keyframes = `
-                    @keyframes fall {
-                        0% {
-                            transform: translateY(-10px) rotate(0deg);
-                            opacity: 0;
-                        }
-                        10% {
-                            opacity: 1;
-                        }
-                        100% {
-                            transform: translateY(${window.innerHeight}px) rotate(${Math.random() * 360}deg);
-                            opacity: 0;
-                        }
-                    }
-                `;
-                
-                try {
-                    styleSheet.insertRule(keyframes, styleSheet.cssRules.length);
-                } catch (e) {
-                    // Some browsers may not support this
-                    console.log("Could not insert keyframes", e);
-                }
-                
-                confettiContainer.appendChild(confetti);
-            }
-        }
-        
-        // Reset the game
-        function resetGame() {
-            // Reset board state
-            board = Array(9).fill(PLAYER.NONE);
-
-            // Clear move queues
-            xMoves = [];
-            oMoves = [];
-
-            // Reset all game variables
-            totalMoves = 0;
-            gameState = GAME_STATE.PLAYING;
-            winner = null;
-            timeoutPlayer = null;
-            currentPlayer = PLAYER.X;
-            winningLine = null;
-            lastMovedIndex = -1;
-            removedMarkerIndex = -1;
-            gameRound++;
-
-            // Reset timer with current time setting
-            remainingTime = TIME_PER_MOVE;
-
-            // Update UI
-            createBoard();
-            startTimer();
-            updateUI();
-
-            // Hide dialog
-            gameOverDialog.style.display = "none";
-
-            // Stop confetti
-            confettiContainer.innerHTML = '';
-
-            // Remove any winning lines
-            const existingLine = document.querySelector('.winning-line');
-            if (existingLine) {
-                existingLine.parentNode.removeChild(existingLine);
-            }
-
-            // Remove any oldest marker indicators
-            const oldHighlighted = document.querySelectorAll('.oldest-marker');
-            oldHighlighted.forEach(cell => {
-                cell.classList.remove('oldest-marker');
             });
-        }
 
-        // Update UI elements
-        function updateUI() {
-            // Update player indicator
-            playerIndicator.textContent = currentPlayer;
-            playerIndicator.className = `player-marker player-${currentPlayer.toLowerCase()}`;
+            // No previous/next buttons
 
-            // Update scores
-            xScoreElement.textContent = xScore;
-            oScoreElement.textContent = oScore;
-            drawScoreElement.textContent = drawCount;
+            // Video ended event (autoplay next)
+            videos.forEach(video => {
+                video.addEventListener('ended', function () {
+                    currentVideoIndex = (currentVideoIndex + 1) % videos.length;
+                    playCurrentVideo();
+                    // If it was the last video, stop playing
+                    if (currentVideoIndex === 0) {
+                        isPlaying = false;
+                        playPauseBtn.textContent = 'Play';
+                        stopEmojiAnimation();
+                    }
+                });
 
-            // Update round number
-            roundNumber.textContent = gameRound;
+                // Update progress
+                video.addEventListener('timeupdate', updateProgress);
 
-            // Show the power-down effect immediately
-            highlightOldestMarker();
-        }
+                // Handle metadata loaded
+                video.addEventListener('loadedmetadata', updateDuration);
+            });
 
-        
-        // Event listeners
-        playAgainButton.addEventListener('click', resetGame);
-        
-        // Close button returns to start menu
-        closeDialogButton.addEventListener('click', () => {
-            gameOverDialog.style.display = 'none';
-            gameContainer.style.display = 'none';
-            startScreen.style.opacity = '1';
-            startScreen.style.display = 'flex';
-
-            // Reset game state for next start
-            resetGame();
-
-            // Ensure theme toggle is visible on start screen
-            const startThemeToggle = document.getElementById('theme-toggle');
-            if (!startThemeToggle) {
-                addThemeToggle();
-            }
+            // Initialize
+            playCurrentVideo();
         });
-        
-        // Start button functionality
-        const startScreen = document.getElementById('start-screen');
-        const gameContainer = document.getElementById('game-container');
-        const startGameButton = document.getElementById('start-game-button');
-        
-        // Remove both existing startGameButton event listeners and replace with this one:
-
-        const originalStartGameButtonClick = startGameButton.onclick;
-        startGameButton.addEventListener('click', () => {
-            // Set the game time from the slider value
-            TIME_PER_MOVE = parseInt(timeSlider.value) * 1000;
-
-            // Hide start screen with fade out animation
-            startScreen.style.opacity = '0';
-            startScreen.style.transition = 'opacity 0.5s ease-out';
-
-            // Show game container after animation
-            setTimeout(() => {
-                startScreen.style.display = 'none';
-                gameContainer.style.display = 'block';
-
-                // Add theme toggle to game screen
-                addGameThemeToggle();
-
-                // Initialize the game
-                initGame();
-            }, 500);
-        });
-        
-        // Play Again button simply resets the game and continues
-        playAgainButton.addEventListener('click', resetGame);
     </script>
 </body>
 </html>
