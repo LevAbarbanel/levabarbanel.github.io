@@ -514,33 +514,39 @@
             const modal = document.getElementById('viewer-modal');
             const iframe = document.getElementById('doc-frame');
 
-            // ניקוי הקישור
+            // 1. Clean the URL
             let cleanUrl = item.url;
             if (cleanUrl.includes('/edit')) cleanUrl = cleanUrl.split('/edit')[0];
             if (cleanUrl.includes('/pub')) cleanUrl = cleanUrl.split('/pub')[0];
             if (cleanUrl.includes('/view')) cleanUrl = cleanUrl.split('/view')[0];
             if (cleanUrl.includes('/preview')) cleanUrl = cleanUrl.split('/preview')[0];
 
-            // אנחנו תמיד משתמשים ב-PREVIEW!
-            iframe.src = cleanUrl + '/preview';
-
-            // בדיקת מובייל
+            // 2. DETECT MOBILE
             const isMobile = window.innerWidth <= 768;
-            
+
+            // 3. CONSTRUCT URL
+            // We use ?rm=minimal to remove the mobile "Open in App" banners and toolbars
+            // We intentionally do NOT use simple '/preview' on mobile if we can avoid it
+            let finalSrc = cleanUrl + '/preview?rm=minimal';
+
+            iframe.src = finalSrc;
+
             if (isMobile) {
-                // === קסם הזום למובייל ===
-                // אנחנו קובעים שרוחב המסמך צריך להיות 850 פיקסלים (כמו דף רגיל)
-                // ואז מקטינים את הכל כדי שייכנס למסך הטלפון
-                const targetWidth = 850; 
+                // === THE ZOOM MAGIC ===
+                // We force the iframe to be 850px (Desktop A4 size width)
+                // Then we scale it down to fit the phone screen
+                const targetWidth = 850;
                 const scale = window.innerWidth / targetWidth;
 
-                iframe.style.width = `${targetWidth}px`; // רוחב דסקטופ
-                iframe.style.height = `${100 / scale}%`; // גובה מותאם כדי למלא את המסך אחרי ההקטנה
-                iframe.style.transform = `scale(${scale})`; // כיווץ
-                iframe.style.transformOrigin = '0 0'; // כיווץ מהפינה השמאלית העליונה
-                iframe.style.top = '-45px'; // עדיין חותכים את הכותרת של גוגל
+                iframe.style.width = `${targetWidth}px`;
+                iframe.style.height = `${100 / scale}%`;
+                iframe.style.transform = `scale(${scale})`;
+                iframe.style.transformOrigin = '0 0';
+
+                // Adjust top to hide any remaining Google header white-space
+                iframe.style.top = '-2px';
             } else {
-                // איפוס למחשב רגיל
+                // Desktop Reset
                 iframe.style.width = '100%';
                 iframe.style.height = 'calc(100% + 62px)';
                 iframe.style.transform = 'none';
@@ -550,6 +556,7 @@
             modal.classList.add('active');
             document.body.classList.add('viewing-doc');
 
+            // ... (Rest of your database viewer presence code remains the same) ...
             const myPresenceRef = db.ref(`viewers/${currentDocId}/${currentUser.uid}`);
             myPresenceRef.set({
                 name: currentUser.displayName,
