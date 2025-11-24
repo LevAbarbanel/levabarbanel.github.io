@@ -36,67 +36,37 @@
 
         /* --- LOGO & BUBBLE CONTAINER --- */
         #logo-container {
-            position: fixed;
-            top: 25px;
-            right: 25px;
-            z-index: 100000;
-            display: flex;
-            align-items: center;
-            flex-direction: row-reverse;
-            gap: 15px;
+            position: fixed; top: 25px; right: 25px; z-index: 100000;
+            display: flex; align-items: center; flexDirection: row-reverse; gap: 15px;
             transition: top 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55);
         }
 
-        body.viewing-doc #logo-container {
-            top: 90px;
-        }
+        body.viewing-doc #logo-container { top: 90px; }
 
         #fixed-logo {
-            width: 60px;
-            cursor: pointer;
+            width: 60px; cursor: pointer;
             filter: drop-shadow(0 0 5px var(--term-green)) opacity(0.9);
             animation: logo-pulse 4s infinite alternate;
             transition: transform 0.2s;
         }
-
-        #fixed-logo:active {
-            transform: scale(0.9);
-        }
+        #fixed-logo:active { transform: scale(0.9); }
 
         #pixel-bubble {
-            background: black;
-            color: var(--term-green);
-            border: 2px solid var(--term-green);
-            padding: 10px 15px;
-            font-size: 0.8rem;
-            font-weight: bold;
+            background: black; color: var(--term-green);
+            border: 2px solid var(--term-green); padding: 10px 15px;
+            font-size: 0.8rem; font-weight: bold;
             font-family: 'Courier New', Courier, monospace;
-            position: relative;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateX(-10px);
-            transition: all 0.3s ease;
+            position: relative; opacity: 0; visibility: hidden;
+            transform: translateX(-10px); transition: all 0.3s ease;
             box-shadow: 0 0 10px var(--term-dark-green);
-            white-space: nowrap;
-            pointer-events: none;
+            white-space: nowrap; pointer-events: none;
         }
-
         #pixel-bubble::after {
-            content: '';
-            position: absolute;
-            right: -8px;
-            top: 50%;
-            transform: translateY(-50%);
-            border-top: 8px solid transparent;
-            border-bottom: 8px solid transparent;
-            border-left: 8px solid var(--term-green);
+            content: ''; position: absolute; right: -8px; top: 50%;
+            transform: translateY(-50%); border-top: 8px solid transparent;
+            border-bottom: 8px solid transparent; border-left: 8px solid var(--term-green);
         }
-
-        #pixel-bubble.show {
-            opacity: 1;
-            visibility: visible;
-            transform: translateX(0);
-        }
+        #pixel-bubble.show { opacity: 1; visibility: visible; transform: translateX(0); }
 
         @keyframes logo-pulse {
             0% { filter: drop-shadow(0 0 2px var(--term-green)) opacity(0.7); transform: scale(1); }
@@ -106,10 +76,7 @@
             100% { filter: drop-shadow(0 0 2px var(--term-green)) opacity(0.7); transform: scale(1); }
         }
 
-        canvas#matrix {
-            position: fixed; top: 0; left: 0; z-index: -1;
-            width: 100%; height: 100%; opacity: 0.8;
-        }
+        canvas#matrix { position: fixed; top: 0; left: 0; z-index: -1; width: 100%; height: 100%; opacity: 0.8; }
 
         body::after {
             content: " "; display: block; position: fixed;
@@ -124,20 +91,17 @@
             justify-content: center; align-items: center;
             background: transparent; position: relative; z-index: 10;
         }
-
         #login-screen h1 {
             color: white; font-size: 3.5rem; margin-bottom: 30px;
             text-transform: uppercase; position: relative;
             text-shadow: 0.05em 0 0 #00fffc, -0.03em -0.04em 0 #fc00ff, 0.025em 0.04em 0 #fffc00;
             animation: glitch 725ms infinite;
         }
-
         @keyframes glitch {
             0% { text-shadow: 0.05em 0 0 #00fffc, -0.03em -0.04em 0 #fc00ff, 0.025em 0.04em 0 #fffc00; }
             50% { text-shadow: 0.05em 0.035em 0 #00fffc, 0.03em 0 0 #fc00ff, 0 -0.04em 0 #fffc00; }
             100% { text-shadow: -0.05em 0 0 #00fffc, -0.025em -0.04em 0 #fc00ff, -0.04em -0.025em 0 #fffc00; }
         }
-
         button#google-login-btn {
             background-color: black; color: var(--term-green);
             border: 2px solid var(--term-green); padding: 15px 40px;
@@ -147,7 +111,6 @@
             transition: all 0.3s ease; display: flex; align-items: center;
             gap: 15px; position: relative; overflow: hidden;
         }
-
         button#google-login-btn:hover {
             background-color: var(--term-green); color: black;
             box-shadow: 0 0 20px var(--term-green);
@@ -155,15 +118,11 @@
 
         /* --- APP HEADER --- */
         #app { display: none; padding-bottom: 50px; position: relative; z-index: 10; }
-
         header {
-            background-color: rgba(0,0,0,0.9);
-            border-bottom: 2px solid var(--term-green);
+            background-color: rgba(0,0,0,0.9); border-bottom: 2px solid var(--term-green);
             color: var(--term-green); padding: 40px 20px;
-            text-align: center; box-shadow: var(--border-glow);
-            margin-bottom: 20px;
+            text-align: center; box-shadow: var(--border-glow); margin-bottom: 20px;
         }
-
         header h2 {
             text-transform: uppercase; letter-spacing: 4px;
             margin: 10px 0; text-shadow: var(--text-shadow);
@@ -175,7 +134,6 @@
             margin: 0 auto 20px auto; animation: heartbeat 1.5s infinite;
             filter: drop-shadow(0 0 10px red);
         }
-
         .lev-animation:before, .lev-animation:after {
             position: absolute; content: "";
             left: 50px; top: 0; width: 50px; height: 80px;
@@ -183,11 +141,9 @@
             transform: rotate(-45deg); transform-origin: 0 100%;
             border: 2px solid white;
         }
-
         .lev-animation:after {
             left: 0; transform: rotate(45deg); transform-origin: 100% 100%;
         }
-
         @keyframes heartbeat {
             0% { transform: scale(1); opacity: 0.8; }
             14% { transform: scale(1.1); opacity: 1; filter: drop-shadow(0 0 20px red); }
@@ -200,7 +156,6 @@
             display: flex; flex-wrap: wrap; justify-content: center;
             gap: 30px; padding: 40px 20px; max-width: 1200px; margin: 0 auto;
         }
-
         .card {
             background: var(--glass-bg); border: 1px solid var(--term-dark-green);
             width: 240px; border-radius: 4px; overflow: hidden;
@@ -209,41 +164,25 @@
             display: flex; flex-direction: column; backdrop-filter: blur(5px);
             position: relative;
         }
-
         .card::before {
             content: "SECURE_FILE"; position: absolute;
             top: 5px; left: 5px; font-size: 0.6rem; opacity: 0.7;
         }
-
         .card:hover {
             transform: translateY(-5px) scale(1.02);
             box-shadow: 0 0 25px rgba(0, 255, 65, 0.6);
             border-color: var(--term-green); background: rgba(0, 40, 0, 0.9);
         }
-
         .card-preview {
             height: 140px; background-color: rgba(0,0,0,0.5);
             display: flex; align-items: center; justify-content: center;
             font-size: 3rem; color: var(--term-green);
             border-bottom: 1px solid var(--term-dark-green);
         }
-
-        .card h3 {
-            margin: 15px 0 5px 0; font-size: 1.1rem; color: white;
-            text-transform: uppercase;
-        }
-
-        .card p {
-            color: var(--term-green); font-size: 0.8rem;
-            padding: 0 10px 15px 10px; opacity: 0.8;
-        }
-
-        .card.tba {
-            cursor: not-allowed; opacity: 0.5; background: rgba(50,50,50,0.5);
-            border-color: #555;
-        }
+        .card h3 { margin: 15px 0 5px 0; font-size: 1.1rem; color: white; text-transform: uppercase; }
+        .card p { color: var(--term-green); font-size: 0.8rem; padding: 0 10px 15px 10px; opacity: 0.8; }
+        .card.tba { cursor: not-allowed; opacity: 0.5; background: rgba(50,50,50,0.5); border-color: #555; }
         .card.tba p, .card.tba h3 { color: #aaa; }
-
         .badge {
             background: #333; color: #fff; padding: 2px 8px;
             border: 1px solid #777; font-size: 0.7rem; vertical-align: middle;
@@ -256,7 +195,6 @@
             flex-direction: column; transform: translateY(100%);
             transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
-
         #viewer-modal.active { transform: translateY(0); }
 
         .viewer-header {
@@ -267,11 +205,7 @@
             box-shadow: 0 5px 20px rgba(0, 255, 65, 0.2); z-index: 10;
         }
 
-        .viewers-list {
-            display: flex;
-            align-items: center;
-        }
-
+        .viewers-list { display: flex; align-items: center; }
         .viewers-list img {
             width: 36px; height: 36px; border-radius: 50%;
             border: 2px solid var(--term-green); background: #000;
@@ -285,17 +219,16 @@
             font-family: var(--font-stack); text-transform: uppercase;
             transition: all 0.2s;
         }
-
-        .close-btn:hover {
-            background: red; color: black; box-shadow: 0 0 15px red;
-        }
+        .close-btn:hover { background: red; color: black; box-shadow: 0 0 15px red; }
 
         .iframe-wrapper {
             flex: 1; width: 100%; position: relative; overflow: hidden;
         }
 
+        /* עיצוב ברירת מחדל למחשב */
         iframe#doc-frame {
-            position: absolute; top: -62px; left: 0;
+            position: absolute; 
+            top: -62px; left: 0;
             width: 100%; height: calc(100% + 62px);
             border: none; background: white;
         }
@@ -305,40 +238,21 @@
             transform: translate(-50%, -50%); color: var(--term-green);
             font-size: 1.5rem; animation: blink 1s infinite; z-index: -1;
         }
-
         @keyframes blink { 50% { opacity: 0; } }
 
-        /* --- תיקונים למובייל (Mobile Responsive) --- */
+        /* --- MEDIA QUERIES FOR MOBILE --- */
         @media (max-width: 768px) {
-
             .viewer-header { padding: 0 10px; height: 50px; }
-
             #doc-title-display {
                 font-size: 0.8rem; max-width: 100px;
                 overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
             }
-
             .close-btn { padding: 5px 10px; font-size: 0.7rem; }
-
             .viewers-label { display: none; } 
             #active-viewers { display: flex; }
-
-            /* גודל ברירת מחדל לנייד */
-            .viewers-list img {
-                width: 28px; height: 28px;
-                margin-left: 4px;
-            }
-
-            /* מחלקות דינמיות */
+            .viewers-list img { width: 28px; height: 28px; margin-left: 4px; }
             .viewers-list.dense img { width: 24px; height: 24px; margin-left: -5px; }
             .viewers-list.super-dense img { width: 18px; height: 18px; margin-left: -8px; border-width: 1px; }
-
-            /* במובייל אנחנו לא קובעים גודל ב-CSS, כי ה-JS יטפל בזה */
-            iframe#doc-frame {
-                /* ברירת מחדל - ידרס ע"י ה-JS */
-                width: 100%;
-                height: 100%;
-            }
             
             #logo-container { top: 15px; right: 15px; transform: scale(0.8); }
             body.viewing-doc #logo-container { top: 60px; right: 10px; z-index: 5; }
@@ -523,35 +437,31 @@
             if (cleanUrl.includes('/view')) cleanUrl = cleanUrl.split('/view')[0];
             if (cleanUrl.includes('/preview')) cleanUrl = cleanUrl.split('/preview')[0];
 
-            // אנחנו תמיד משתמשים ב-PREVIEW!
-            iframe.src = cleanUrl + '/preview';
-
-            // בדיקת מובייל + טריק ה-Zoom Out
+            // 1. הגדרת הרוחב והזום *לפני* טעינת ה-SRC
+            // זה הקסם: אנחנו מגדירים ל-iframe רוחב של מחשב (1280) גם בטלפון
             const isMobile = window.innerWidth <= 768;
             
             if (isMobile) {
-                // === קסם הזום למובייל ===
-                // 1. קובעים שרוחב המסמך הוא 850 פיקסלים (כמו מחשב)
-                const targetWidth = 850; 
+                const desktopWidth = 1280; // רוחב שבו גוגל בטוח יציג דסקטופ
+                const scale = window.innerWidth / desktopWidth;
                 
-                // 2. מחשבים כמה צריך להקטין כדי שזה ייכנס ברוחב המסך הנוכחי
-                const scale = window.innerWidth / targetWidth;
-
-                // 3. מיישמים את השינויים על ה-iframe
-                iframe.style.width = `${targetWidth}px`; // רוחב ענק
-                iframe.style.height = `${100 / scale}%`; // גובה מותאם (כי ה-scale מקטין גם את הגובה)
-                iframe.style.transform = `scale(${scale})`; // כיווץ
-                iframe.style.transformOrigin = '0 0'; // נקודת הכיווץ (שמאל למעלה)
+                iframe.style.width = `${desktopWidth}px`; 
+                iframe.style.height = `${100 / scale}%`; 
+                iframe.style.transform = `scale(${scale})`; 
+                iframe.style.transformOrigin = '0 0';
                 
-                // 4. חיתוך הכותרת (טיפה פחות אגרסיבי בגלל ה-scale)
-                iframe.style.top = '-45px'; 
+                // חיתוך הכותרת - במצב דסקטופ הבר הוא בערך 64 פיקסלים
+                iframe.style.top = '-64px'; 
             } else {
-                // איפוס למחשב רגיל (חייב לאפס למקרה ששינו גודל חלון)
+                // איפוס למחשב רגיל
                 iframe.style.width = '100%';
                 iframe.style.height = 'calc(100% + 62px)';
                 iframe.style.transform = 'none';
                 iframe.style.top = '-62px';
             }
+
+            // 2. טעינת ה-SRC (תמיד preview) עם פרמטר שמנסה להסתיר תפריטים
+            iframe.src = cleanUrl + '/preview?rm=minimal'; 
 
             modal.classList.add('active');
             document.body.classList.add('viewing-doc');
