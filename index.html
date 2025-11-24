@@ -3,10 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="referrer" content="no-referrer">
-
-    <!-- 1. FORCE DESKTOP WIDTH -->
-    <meta name="viewport" content="width=1024">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>האתר של לב</title>
     <link rel="icon" type="image/x-icon" href="icon.png">
 
@@ -17,6 +14,7 @@
     <script src="config.js"></script>
 
     <style>
+        /* --- CORE THEME VARIABLES --- */
         :root {
             --term-green: #00ff41;
             --term-dark-green: #008F11;
@@ -33,11 +31,10 @@
             margin: 0;
             padding: 0;
             color: var(--term-green);
-            overflow-x: auto;
-            width: 1024px;
+            overflow-x: hidden;
         }
 
-        /* --- LOGO --- */
+        /* --- LOGO & BUBBLE CONTAINER --- */
         #logo-container {
             position: fixed;
             top: 25px;
@@ -59,6 +56,11 @@
             cursor: pointer;
             filter: drop-shadow(0 0 5px var(--term-green)) opacity(0.9);
             animation: logo-pulse 4s infinite alternate;
+            transition: transform 0.2s;
+        }
+
+        #fixed-logo:active {
+            transform: scale(0.9);
         }
 
         #pixel-bubble {
@@ -68,214 +70,276 @@
             padding: 10px 15px;
             font-size: 0.8rem;
             font-weight: bold;
+            font-family: 'Courier New', Courier, monospace;
             position: relative;
             opacity: 0;
             visibility: hidden;
             transform: translateX(-10px);
             transition: all 0.3s ease;
+            box-shadow: 0 0 10px var(--term-dark-green);
+            white-space: nowrap;
             pointer-events: none;
         }
 
-            #pixel-bubble.show {
-                opacity: 1;
-                visibility: visible;
-                transform: translateX(0);
-            }
+        #pixel-bubble::after {
+            content: '';
+            position: absolute;
+            right: -8px;
+            top: 50%;
+            transform: translateY(-50%);
+            border-top: 8px solid transparent;
+            border-bottom: 8px solid transparent;
+            border-left: 8px solid var(--term-green);
+        }
+
+        #pixel-bubble.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(0);
+        }
 
         @keyframes logo-pulse {
-            0% {
-                filter: drop-shadow(0 0 2px var(--term-green));
-                transform: scale(1);
-            }
-
-            50% {
-                filter: drop-shadow(0 0 15px var(--term-green));
-                transform: scale(1.05);
-            }
-
-            100% {
-                filter: drop-shadow(0 0 2px var(--term-green));
-                transform: scale(1);
-            }
+            0% { filter: drop-shadow(0 0 2px var(--term-green)) opacity(0.7); transform: scale(1); }
+            50% { filter: drop-shadow(0 0 15px var(--term-green)) opacity(1); transform: scale(1.05); }
+            52% { filter: drop-shadow(0 0 2px red) opacity(0.8); transform: translateX(2px); }
+            54% { filter: drop-shadow(0 0 15px var(--term-green)) opacity(1); transform: scale(1.05); }
+            100% { filter: drop-shadow(0 0 2px var(--term-green)) opacity(0.7); transform: scale(1); }
         }
 
         canvas#matrix {
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: -1;
-            width: 100%;
-            height: 100%;
-            opacity: 0.8;
+            position: fixed; top: 0; left: 0; z-index: -1;
+            width: 100%; height: 100%; opacity: 0.8;
         }
 
-        /* --- LOGIN --- */
+        body::after {
+            content: " "; display: block; position: fixed;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 99999; background-size: 100% 2px, 3px 100%; pointer-events: none;
+        }
+
+        /* --- LOGIN SCREEN --- */
         #login-screen {
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 10;
+            height: 100vh; display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            background: transparent; position: relative; z-index: 10;
         }
 
-            #login-screen h1 {
-                color: white;
-                font-size: 3.5rem;
-                margin-bottom: 30px;
-                text-shadow: 0.05em 0 0 #00fffc, -0.03em -0.04em 0 #fc00ff;
-            }
+        #login-screen h1 {
+            color: white; font-size: 3.5rem; margin-bottom: 30px;
+            text-transform: uppercase; position: relative;
+            text-shadow: 0.05em 0 0 #00fffc, -0.03em -0.04em 0 #fc00ff, 0.025em 0.04em 0 #fffc00;
+            animation: glitch 725ms infinite;
+        }
+
+        @keyframes glitch {
+            0% { text-shadow: 0.05em 0 0 #00fffc, -0.03em -0.04em 0 #fc00ff, 0.025em 0.04em 0 #fffc00; }
+            50% { text-shadow: 0.05em 0.035em 0 #00fffc, 0.03em 0 0 #fc00ff, 0 -0.04em 0 #fffc00; }
+            100% { text-shadow: -0.05em 0 0 #00fffc, -0.025em -0.04em 0 #fc00ff, -0.04em -0.025em 0 #fffc00; }
+        }
 
         button#google-login-btn {
-            background-color: black;
-            color: var(--term-green);
-            border: 2px solid var(--term-green);
-            padding: 15px 40px;
-            font-size: 1.2rem;
-            cursor: pointer;
-            box-shadow: var(--border-glow);
-            text-transform: uppercase;
+            background-color: black; color: var(--term-green);
+            border: 2px solid var(--term-green); padding: 15px 40px;
+            font-size: 1.2rem; font-family: var(--font-stack);
+            text-transform: uppercase; letter-spacing: 2px;
+            cursor: pointer; box-shadow: var(--border-glow);
+            transition: all 0.3s ease; display: flex; align-items: center;
+            gap: 15px; position: relative; overflow: hidden;
         }
 
-        /* --- APP --- */
-        #app {
-            display: none;
-            padding-bottom: 50px;
-            z-index: 10;
-            position: relative;
+        button#google-login-btn:hover {
+            background-color: var(--term-green); color: black;
+            box-shadow: 0 0 20px var(--term-green);
         }
+
+        /* --- APP HEADER --- */
+        #app { display: none; padding-bottom: 50px; position: relative; z-index: 10; }
 
         header {
             background-color: rgba(0,0,0,0.9);
             border-bottom: 2px solid var(--term-green);
-            color: var(--term-green);
-            padding: 40px 20px;
-            text-align: center;
+            color: var(--term-green); padding: 40px 20px;
+            text-align: center; box-shadow: var(--border-glow);
+            margin-bottom: 20px;
         }
 
+        header h2 {
+            text-transform: uppercase; letter-spacing: 4px;
+            margin: 10px 0; text-shadow: var(--text-shadow);
+        }
+
+        /* --- HEART ANIMATION --- */
+        .lev-animation {
+            position: relative; width: 100px; height: 90px;
+            margin: 0 auto 20px auto; animation: heartbeat 1.5s infinite;
+            filter: drop-shadow(0 0 10px red);
+        }
+
+        .lev-animation:before, .lev-animation:after {
+            position: absolute; content: "";
+            left: 50px; top: 0; width: 50px; height: 80px;
+            background: #ff0055; border-radius: 50px 50px 0 0;
+            transform: rotate(-45deg); transform-origin: 0 100%;
+            border: 2px solid white;
+        }
+
+        .lev-animation:after {
+            left: 0; transform: rotate(45deg); transform-origin: 100% 100%;
+        }
+
+        @keyframes heartbeat {
+            0% { transform: scale(1); opacity: 0.8; }
+            14% { transform: scale(1.1); opacity: 1; filter: drop-shadow(0 0 20px red); }
+            28% { transform: scale(1); opacity: 0.8; }
+            70% { transform: scale(1); opacity: 0.8; }
+        }
+
+        /* --- GALLERY --- */
         .gallery {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 30px;
-            padding: 40px 20px;
-            max-width: 1200px;
-            margin: 0 auto;
+            display: flex; flex-wrap: wrap; justify-content: center;
+            gap: 30px; padding: 40px 20px; max-width: 1200px; margin: 0 auto;
         }
 
         .card {
-            background: var(--glass-bg);
-            border: 1px solid var(--term-dark-green);
-            width: 240px;
-            border-radius: 4px;
-            overflow: hidden;
-            cursor: pointer;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
+            background: var(--glass-bg); border: 1px solid var(--term-dark-green);
+            width: 240px; border-radius: 4px; overflow: hidden;
+            box-shadow: 0 0 5px rgba(0, 255, 65, 0.2);
+            transition: all 0.3s ease; cursor: pointer; text-align: center;
+            display: flex; flex-direction: column; backdrop-filter: blur(5px);
+            position: relative;
+        }
+
+        .card::before {
+            content: "SECURE_FILE"; position: absolute;
+            top: 5px; left: 5px; font-size: 0.6rem; opacity: 0.7;
+        }
+
+        .card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 0 25px rgba(0, 255, 65, 0.6);
+            border-color: var(--term-green); background: rgba(0, 40, 0, 0.9);
         }
 
         .card-preview {
-            height: 140px;
-            background-color: rgba(0,0,0,0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3rem;
+            height: 140px; background-color: rgba(0,0,0,0.5);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 3rem; color: var(--term-green);
             border-bottom: 1px solid var(--term-dark-green);
         }
 
         .card h3 {
-            margin: 15px 0 5px 0;
-            font-size: 1.1rem;
-            color: white;
+            margin: 15px 0 5px 0; font-size: 1.1rem; color: white;
+            text-transform: uppercase;
         }
 
         .card p {
-            color: var(--term-green);
-            font-size: 0.8rem;
-            padding: 0 10px 15px 10px;
+            color: var(--term-green); font-size: 0.8rem;
+            padding: 0 10px 15px 10px; opacity: 0.8;
         }
 
-        /* --- VIEWER (OBJECT TAG) --- */
+        .card.tba {
+            cursor: not-allowed; opacity: 0.5; background: rgba(50,50,50,0.5);
+            border-color: #555;
+        }
+        .card.tba p, .card.tba h3 { color: #aaa; }
+
+        .badge {
+            background: #333; color: #fff; padding: 2px 8px;
+            border: 1px solid #777; font-size: 0.7rem; vertical-align: middle;
+        }
+
+        /* --- VIEWER MODAL --- */
         #viewer-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: black;
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            transform: translateY(100%);
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: black; z-index: 9999; display: flex;
+            flex-direction: column; transform: translateY(100%);
             transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
 
-            #viewer-modal.active {
-                transform: translateY(0);
-            }
+        #viewer-modal.active { transform: translateY(0); }
 
         .viewer-header {
-            height: 60px;
-            background: #111;
+            height: 60px; background: #111;
             border-bottom: 2px solid var(--term-green);
-            color: var(--term-green);
+            color: var(--term-green); display: flex; align-items: center;
+            padding: 0 20px; justify-content: space-between;
+            box-shadow: 0 5px 20px rgba(0, 255, 65, 0.2); z-index: 10;
+        }
+
+        .viewers-list {
             display: flex;
             align-items: center;
-            padding: 0 20px;
-            justify-content: space-between;
-            z-index: 10;
+        }
+
+        .viewers-list img {
+            width: 36px; height: 36px; border-radius: 50%;
+            border: 2px solid var(--term-green); background: #000;
+            margin-left: 8px; box-shadow: 0 0 10px var(--term-green);
+            transition: all 0.3s ease;
         }
 
         .close-btn {
-            background: transparent;
-            border: 1px solid red;
-            color: red;
-            padding: 8px 16px;
-            cursor: pointer;
-            font-weight: bold;
+            background: transparent; border: 1px solid red; color: red;
+            padding: 8px 16px; cursor: pointer; font-weight: bold;
+            font-family: var(--font-stack); text-transform: uppercase;
+            transition: all 0.2s;
+        }
+
+        .close-btn:hover {
+            background: red; color: black; box-shadow: 0 0 15px red;
         }
 
         .iframe-wrapper {
-            flex: 1;
-            width: 100%;
-            position: relative;
-            overflow: hidden;
-            background: white;
+            flex: 1; width: 100%; position: relative; overflow: hidden;
         }
 
-        /* 2. FORCE PDF OBJECT STYLE */
-        object#doc-object {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: none;
+        iframe#doc-frame {
+            position: absolute; 
+            /* הגדרות ברירת מחדל למחשב - חותכות את הכותרת */
+            top: -62px; left: 0;
+            width: 100%; height: calc(100% + 62px);
+            border: none; background: white;
         }
 
         .loading-msg {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: var(--term-green);
-            z-index: -1;
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%); color: var(--term-green);
+            font-size: 1.5rem; animation: blink 1s infinite; z-index: -1;
         }
 
-        /* --- MOBILE --- */
+        @keyframes blink { 50% { opacity: 0; } }
+
+        /* --- תיקונים למובייל (Mobile Responsive) --- */
         @media (max-width: 768px) {
-            .viewer-header {
-                padding: 0 10px;
-                height: 50px;
+
+            .viewer-header { padding: 0 10px; height: 50px; }
+
+            #doc-title-display {
+                font-size: 0.8rem; max-width: 100px;
+                overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
             }
 
-            #logo-container {
-                top: 15px;
-                right: 15px;
-                transform: scale(0.8);
+            .close-btn { padding: 5px 10px; font-size: 0.7rem; }
+
+            .viewers-label { display: none; } 
+            #active-viewers { display: flex; }
+
+            /* גודל ברירת מחדל לנייד */
+            .viewers-list img {
+                width: 28px; height: 28px;
+                margin-left: 4px;
             }
+
+            /* מחלקות דינמיות לצפיפות אייקונים */
+            .viewers-list.dense img { width: 24px; height: 24px; margin-left: -5px; }
+            .viewers-list.super-dense img { width: 18px; height: 18px; margin-left: -8px; border-width: 1px; }
+
+            /* אנחנו משאירים את הגדרות ה-iframe רגילות ב-CSS
+               כי אנחנו נשלוט עליו עם JavaScript כדי לעשות את הכיווץ */
+            
+            #logo-container { top: 15px; right: 15px; transform: scale(0.8); }
+            body.viewing-doc #logo-container { top: 60px; right: 10px; z-index: 5; }
         }
     </style>
 </head>
@@ -291,7 +355,9 @@
     <div id="login-screen">
         <div class="lev-animation"></div>
         <h1 data-text="הסיכומים של לב">הסיכומים של לב</h1>
-        <button id="google-login-btn"> [ ACCESS SYSTEM ] </button>
+        <button id="google-login-btn">
+            [ ACCESS SYSTEM ]
+        </button>
         <p style="margin-top: 15px; font-size: 0.8rem; letter-spacing: 2px; opacity: 0.7;">ENCRYPTED CONNECTION</p>
     </div>
 
@@ -309,26 +375,31 @@
 
     <div id="viewer-modal">
         <div class="viewer-header">
-            <button class="close-btn" onclick="closeViewer()">[ X ] CLOSE</button>
-            <span style="margin-right: 15px; font-weight: bold;" id="doc-title-display">LOADING...</span>
+            <div style="display:flex; align-items:center;">
+                <button class="close-btn" onclick="closeViewer()">[ X ] CLOSE</button>
+                <span style="margin-right: 15px; font-weight: bold; letter-spacing: 1px;" id="doc-title-display">LOADING...</span>
+            </div>
+
+            <div style="display:flex; align-items:center;">
+                <span class="viewers-label" style="text-transform:uppercase; font-size:0.7rem;">Active:</span>
+                <div class="viewers-list" id="active-viewers">
+                </div>
+            </div>
         </div>
 
         <div class="loading-msg">DECRYPTING...</div>
 
         <div class="iframe-wrapper">
-            <!-- 3. USE APPLICATION/PDF TYPE -->
-            <!-- This forces the browser to use its native PDF engine, which is ALWAYS desktop layout -->
-            <object id="doc-object" type="application/pdf" data=""></object>
+            <iframe id="doc-frame" src=""></iframe>
         </div>
     </div>
 
     <script>
-        // Matrix & Animation scripts omitted for brevity (same as before)
         const canvas = document.getElementById('matrix');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
-        const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        const alphabet = 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッンABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
         const fontSize = 16;
         const columns = canvas.width / fontSize;
         const rainDrops = [];
@@ -346,15 +417,45 @@
             }
         };
         setInterval(draw, 30);
+        window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
+
+        const logo = document.getElementById('fixed-logo');
+        const bubble = document.getElementById('pixel-bubble');
+        let isBubbleOpen = false;
+
+        const phrases = [
+            "אל תסתכל בקנקן, מה יהיה שם, קולה?",
+            "מה אתה לוחץ? אתה רוצה מכות הא הא?",
+            "אני אחלן וגם בחלן.",
+        ];
+
+        logo.addEventListener('click', () => {
+            if (isBubbleOpen) return;
+            isBubbleOpen = true;
+            const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
+            bubble.innerText = randomPhrase;
+            bubble.classList.add('show');
+            setTimeout(() => {
+                bubble.classList.remove('show');
+                isBubbleOpen = false;
+            }, 3000);
+        });
 
         try { firebase.initializeApp(firebaseConfig); } catch (e) { console.error(e); }
+
         const auth = firebase.auth();
         const db = firebase.database();
+
         let currentUser = null;
         let currentDocId = null;
+        let viewersListener = null;
 
-        document.getElementById('google-login-btn').addEventListener('click', () => {
-            auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+        const loginBtn = document.getElementById('google-login-btn');
+        loginBtn.addEventListener('click', () => {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            auth.signInWithPopup(provider).catch(error => {
+                alert("ACCESS DENIED: " + error.message);
+            });
         });
 
         auth.onAuthStateChanged((user) => {
@@ -365,71 +466,140 @@
                 document.getElementById('user-name-display').innerText = user.displayName;
                 fetchSummariesFromDB();
             } else {
+                currentUser = null;
                 document.getElementById('login-screen').style.display = 'flex';
                 document.getElementById('app').style.display = 'none';
             }
         });
 
-        function logout() { auth.signOut(); location.reload(); }
+        function logout() {
+            auth.signOut();
+            location.reload();
+        }
 
         function fetchSummariesFromDB() {
-            db.ref('summaries').once('value', (snapshot) => {
+            const galleryRef = db.ref('summaries');
+            galleryRef.once('value', (snapshot) => {
                 const container = document.getElementById('gallery-container');
                 container.innerHTML = '';
-                if (snapshot.exists()) {
-                    snapshot.forEach((child) => renderCard(child.val(), container));
+                if (!snapshot.exists()) {
+                    container.innerHTML = '<p>NO DATA FOUND IN DATABASE.</p>';
+                    return;
                 }
+                snapshot.forEach((childSnapshot) => {
+                    const item = childSnapshot.val();
+                    renderCard(item, container);
+                });
             });
         }
 
         function renderCard(item, container) {
             const card = document.createElement('div');
             card.className = `card ${item.tba ? 'tba' : ''}`;
-            card.innerHTML = `<div class="card-preview">${item.icon || '📁'}</div><h3>${item.title}</h3>`;
-            if (!item.tba) card.onclick = () => openViewer(item);
+            const content = `
+                <div class="card-preview">${item.icon || '📁'}</div>
+                <h3>${item.title} ${item.tba ? '<span class="badge">LOCKED</span>' : ''}</h3>
+                <p>${item.tba ? 'DATA CORRUPTED' : 'CLICK TO ACCESS'}</p>
+            `;
+            card.innerHTML = content;
+            if (!item.tba) {
+                card.onclick = () => openViewer(item);
+            }
             container.appendChild(card);
         }
 
         function openViewer(item) {
             currentDocId = item.id;
-            document.getElementById('doc-title-display').innerText = item.title;
+            document.getElementById('doc-title-display').innerText = "ACCESSING: " + item.title;
             const modal = document.getElementById('viewer-modal');
-            const objTag = document.getElementById('doc-object');
+            const iframe = document.getElementById('doc-frame');
 
-            // --- 4. THE MAGIC FIX: CONVERT TO PDF STREAM ---
-            // Instead of loading the webpage (/preview), we extract the ID
-            // and ask Google for the RAW PDF data.
-            // This bypasses the "Mobile View" entirely.
+            // ניקוי הקישור
+            let cleanUrl = item.url;
+            if (cleanUrl.includes('/edit')) cleanUrl = cleanUrl.split('/edit')[0];
+            if (cleanUrl.includes('/pub')) cleanUrl = cleanUrl.split('/pub')[0];
+            if (cleanUrl.includes('/view')) cleanUrl = cleanUrl.split('/view')[0];
+            if (cleanUrl.includes('/preview')) cleanUrl = cleanUrl.split('/preview')[0];
 
-            let fileId = "";
-            // Try to find the ID in the URL (between /d/ and /)
-            const match = item.url.match(/\/d\/(.*?)\//);
-            if (match && match[1]) {
-                fileId = match[1];
+            // אנחנו תמיד משתמשים ב-PREVIEW!
+            iframe.src = cleanUrl + '/preview';
+
+            // בדיקת מובייל
+            const isMobile = window.innerWidth <= 768;
+            
+            if (isMobile) {
+                // === קסם הזום למובייל ===
+                // אנחנו קובעים שרוחב המסמך צריך להיות 850 פיקסלים (כמו דף רגיל)
+                // ואז מקטינים את הכל כדי שייכנס למסך הטלפון
+                const targetWidth = 850; 
+                const scale = window.innerWidth / targetWidth;
+
+                iframe.style.width = `${targetWidth}px`; // רוחב דסקטופ
+                iframe.style.height = `${100 / scale}%`; // גובה מותאם כדי למלא את המסך אחרי ההקטנה
+                iframe.style.transform = `scale(${scale})`; // כיווץ
+                iframe.style.transformOrigin = '0 0'; // כיווץ מהפינה השמאלית העליונה
+                iframe.style.top = '-45px'; // עדיין חותכים את הכותרת של גוגל
             } else {
-                // Fallback: assume the whole string might be an ID if it doesn't look like a URL
-                // or try to handle other formats. For now, try extraction.
-                // If your DB has just IDs, usage is simpler.
-                // Assuming standard Docs URL here.
-            }
-
-            if (fileId) {
-                // This URL forces the browser to handle it as a PDF file
-                const pdfUrl = `https://drive.google.com/uc?export=view&id=${fileId}`;
-                objTag.setAttribute('data', pdfUrl);
-            } else {
-                // Fallback to original URL if extraction fails (might load mobile view)
-                objTag.setAttribute('data', item.url + '/preview');
+                // איפוס למחשב רגיל
+                iframe.style.width = '100%';
+                iframe.style.height = 'calc(100% + 62px)';
+                iframe.style.transform = 'none';
+                iframe.style.top = '-62px';
             }
 
             modal.classList.add('active');
             document.body.classList.add('viewing-doc');
+
+            const myPresenceRef = db.ref(`viewers/${currentDocId}/${currentUser.uid}`);
+            myPresenceRef.set({
+                name: currentUser.displayName,
+                photo: currentUser.photoURL,
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            });
+
+            myPresenceRef.onDisconnect().remove();
+
+            const allViewersRef = db.ref(`viewers/${currentDocId}`);
+            viewersListener = allViewersRef.on('value', (snapshot) => {
+                const viewersDiv = document.getElementById('active-viewers');
+                viewersDiv.innerHTML = '';
+
+                if (snapshot.exists()) {
+                    const viewers = snapshot.val();
+                    const count = Object.keys(viewers).length;
+
+                    viewersDiv.classList.remove('dense', 'super-dense');
+                    if (window.innerWidth <= 768) {
+                        if (count > 8) viewersDiv.classList.add('super-dense');
+                        else if (count > 4) viewersDiv.classList.add('dense');
+                    }
+
+                    Object.values(viewers).forEach(viewer => {
+                        const img = document.createElement('img');
+                        img.src = viewer.photo || 'https://via.placeholder.com/40';
+                        img.onerror = function () {
+                            this.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(viewer.name)}&background=random`;
+                        };
+                        img.title = viewer.name;
+                        viewersDiv.appendChild(img);
+                    });
+                }
+            });
         }
 
         function closeViewer() {
-            document.getElementById('viewer-modal').classList.remove('active');
+            const modal = document.getElementById('viewer-modal');
+            const iframe = document.getElementById('doc-frame');
+            modal.classList.remove('active');
             document.body.classList.remove('viewing-doc');
-            setTimeout(() => { document.getElementById('doc-object').setAttribute('data', ''); }, 400);
+            setTimeout(() => { iframe.src = ''; }, 400);
+            if (currentUser && currentDocId) {
+                db.ref(`viewers/${currentDocId}/${currentUser.uid}`).remove();
+            }
+            if (currentDocId) {
+                db.ref(`viewers/${currentDocId}`).off('value', viewersListener);
+            }
+            currentDocId = null;
         }
     </script>
 </body>
