@@ -54,7 +54,7 @@
 
         /* הלוגו עצמו */
         #fixed-logo {
-            width: 30px;
+            width: 60px;
             cursor: pointer; /* יד מצביעה */
             filter: drop-shadow(0 0 5px var(--term-green)) opacity(0.9);
             animation: logo-pulse 4s infinite alternate;
@@ -476,6 +476,42 @@
                 opacity: 0;
             }
         }
+
+        /* --- תיקונים למובייל (Mobile Responsive) --- */
+        @media (max-width: 768px) {
+
+            /* 1. התאמת הכותרת בטלפון - שלא תהיה צפופה */
+            .viewer-header {
+                padding: 0 10px;
+                height: 50px;
+            }
+
+            /* הקטנת הפונט של הכותרת כדי שייכנס במסך */
+            #doc-title-display {
+                font-size: 0.9rem;
+                max-width: 120px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            .close-btn {
+                padding: 5px 10px;
+                font-size: 0.8rem;
+            }
+
+            /* 2. הסתרת רשימת המחוברים בטלפון (זה תופס המון מקום) */
+            .viewers-label, #active-viewers {
+                display: none;
+            }
+
+            /* 3. תיקון התצוגה של המסמך עצמו בטלפון */
+            iframe#doc-frame {
+                /* במצב מובייל אנחנו לא צריכים חיתוך אגרסיבי כי נשתמש ב-View הרגיל */
+                top: 0;
+                height: 100%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -565,23 +601,16 @@
             "אל תסתכל בקנקן, מה יהיה שם, קולה?",
             "מה אתה לוחץ? אתה רוצה מכות הא הא?",
             "אני אחלן וגם בחלן.",
-            
         ];
 
         logo.addEventListener('click', () => {
-            if (isBubbleOpen) return; // מונע לחיצה כפולה אם הבועה כבר פתוחה
+            if (isBubbleOpen) return;
 
-            // 1. נעל את האפשרות ללחוץ
             isBubbleOpen = true;
-
-            // 2. בחר משפט רנדומלי
             const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
             bubble.innerText = randomPhrase;
-
-            // 3. הצג את הבועה
             bubble.classList.add('show');
 
-            // 4. אחרי 3 שניות - הסתר ושחרר את הנעילה
             setTimeout(() => {
                 bubble.classList.remove('show');
                 isBubbleOpen = false;
@@ -668,10 +697,28 @@
             const modal = document.getElementById('viewer-modal');
             const iframe = document.getElementById('doc-frame');
 
-            iframe.src = item.url;
-            modal.classList.add('active');
+            // --- הלוגיקה החדשה לטיפול בקישורים ---
+            let cleanUrl = item.url;
 
-            // Add class to body to move logo down
+            // מנקים את הקישור מתוספות ישנות
+            if (cleanUrl.includes('/edit')) cleanUrl = cleanUrl.split('/edit')[0];
+            if (cleanUrl.includes('/pub')) cleanUrl = cleanUrl.split('/pub')[0];
+            if (cleanUrl.includes('/view')) cleanUrl = cleanUrl.split('/view')[0];
+            if (cleanUrl.includes('/preview')) cleanUrl = cleanUrl.split('/preview')[0];
+
+            // בדיקה: האם אנחנו במובייל?
+            // אם המסך קטן מ-768 פיקסלים (טאבלט/טלפון), נשתמש ב-View הרגיל
+            // אם המסך גדול (מחשב), נשתמש ב-Preview (תצוגת הדפסה)
+            const isMobile = window.innerWidth <= 768;
+
+            if (isMobile) {
+                iframe.src = cleanUrl + '/view?embedded=true'; // תצוגת מובייל רספונסיבית
+            } else {
+                iframe.src = cleanUrl + '/preview'; // תצוגת הדפסה למחשב
+            }
+            // -------------------------------------
+
+            modal.classList.add('active');
             document.body.classList.add('viewing-doc');
 
             const myPresenceRef = db.ref(`viewers/${currentDocId}/${currentUser.uid}`);
@@ -708,8 +755,6 @@
             const iframe = document.getElementById('doc-frame');
 
             modal.classList.remove('active');
-
-            // Remove class to move logo back up
             document.body.classList.remove('viewing-doc');
 
             setTimeout(() => { iframe.src = ''; }, 400);
