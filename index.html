@@ -3,9 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="referrer" content="no-referrer">
+
+    <!-- FORCE DESKTOP WIDTH: This is crucial for the "Desktop Site" feel -->
     <meta name="viewport" content="width=1024">
+
     <title>האתר של לב</title>
     <link rel="icon" type="image/x-icon" href="icon.png">
+
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
@@ -30,7 +34,9 @@
             margin: 0;
             padding: 0;
             color: var(--term-green);
-            overflow-x: hidden;
+            /* Allow horizontal scroll for desktop view */
+            overflow-x: auto;
+            width: 1024px;
         }
 
         /* --- LOGO & BUBBLE CONTAINER --- */
@@ -446,20 +452,21 @@
             width: 100%;
             position: relative;
             overflow: hidden;
+            /* White background so the object doesn't get lost on black */
+            background: white;
         }
 
-        iframe#doc-frame {
+        /* --- UPDATED: OBJECT TAG STYLING --- */
+        /* Changed from iframe#doc-frame to object#doc-frame */
+        object#doc-frame {
             position: absolute;
             top: -62px;
             left: 0;
             border: none;
             background: white;
-            /* 1. FORCE THE FRAME TO BE HUGE (Tricks Google to show Desktop UI) */
-            width: 250%; /* 2.5x wider than the screen */
-            height: 250%; /* 2.5x taller */
-            /* 2. SHRINK IT BACK DOWN TO FIT (Creates the "Zoomed Out" effect) */
-            transform: scale(0.4);
-            transform-origin: 0 0; /* Pin to top-left */
+            /* Default desktop sizing */
+            width: 100%;
+            height: calc(100% + 62px);
         }
 
         .loading-msg {
@@ -476,6 +483,65 @@
         @keyframes blink {
             50% {
                 opacity: 0;
+            }
+        }
+
+        /* --- MOBILE RESPONSIVE (SCALING LOGIC) --- */
+        /* Only applies if screen is small AND we are forcing desktop content */
+        @media (max-width: 768px) {
+
+            /* Clean up header on mobile */
+            .viewer-header {
+                padding: 0 10px;
+                height: 50px;
+            }
+
+            #doc-title-display {
+                font-size: 0.8rem;
+                max-width: 100px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            .close-btn {
+                padding: 5px 10px;
+                font-size: 0.7rem;
+            }
+
+            .viewers-label {
+                display: none;
+            }
+
+            #active-viewers {
+                display: flex;
+            }
+
+            .viewers-list img {
+                width: 28px;
+                height: 28px;
+                margin-left: 4px;
+            }
+
+            #logo-container {
+                top: 15px;
+                right: 15px;
+                transform: scale(0.8);
+            }
+
+            body.viewing-doc #logo-container {
+                top: 60px;
+                right: 10px;
+                z-index: 5;
+            }
+
+            /* SCALING LOGIC APPLIED TO OBJECT */
+            /* This mimics desktop size by making it huge and shrinking it */
+            object#doc-frame {
+                /* We will handle the exact scale via JS,
+                  but CSS defaults help prevent glitches */
+                width: 100%;
+                height: 100%;
             }
         }
     </style>
@@ -527,12 +593,13 @@
         <div class="loading-msg">DECRYPTING...</div>
 
         <div class="iframe-wrapper">
-            <iframe id="doc-frame" src=""></iframe>
+            <!-- REPLACED IFRAME WITH OBJECT TAG -->
+            <!-- type="text/html" ensures it handles web URLs, not just binary PDFs -->
+            <object id="doc-frame" type="text/html" data=""></object>
         </div>
     </div>
 
     <script>
-
         const canvas = document.getElementById('matrix');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth;
@@ -650,7 +717,9 @@
             currentDocId = item.id;
             document.getElementById('doc-title-display').innerText = "ACCESSING: " + item.title;
             const modal = document.getElementById('viewer-modal');
-            const iframe = document.getElementById('doc-frame');
+
+            // --- UPDATED: Select the Object tag instead of Iframe ---
+            const objTag = document.getElementById('doc-frame');
 
             let cleanUrl = item.url;
             if (cleanUrl.includes('/edit')) cleanUrl = cleanUrl.split('/edit')[0];
@@ -658,13 +727,38 @@
             if (cleanUrl.includes('/view')) cleanUrl = cleanUrl.split('/view')[0];
             if (cleanUrl.includes('/preview')) cleanUrl = cleanUrl.split('/preview')[0];
 
-            // --- CHANGE START: Force Desktop Preview Always ---
-            // We removed the "if (isMobile)" check completely.
-            iframe.src = cleanUrl + '/preview';
-            // --- CHANGE END ---
+            // Always use /preview for the object data
+            const finalUrl = cleanUrl + '/preview';
+
+            // Set the Object data
+            objTag.setAttribute('data', finalUrl);
+
+            // --- MOBILE SCALING LOGIC (Adapted for Object) ---
+            const isMobile = window.innerWidth <= 768;
+
+            if (isMobile) {
+                // Force a "Desktop" width of 850px (A4 size approx)
+                const targetWidth = 850;
+                const scale = window.innerWidth / targetWidth;
+
+                objTag.style.width = `${targetWidth}px`;
+                // Adjust height so it covers the screen after scaling down
+                objTag.style.height = `${100 / scale}%`;
+
+                objTag.style.transform = `scale(${scale})`;
+                objTag.style.transformOrigin = '0 0';
+                objTag.style.top = '-45px';
+            } else {
+                // Reset for desktop
+                objTag.style.width = '100%';
+                objTag.style.height = 'calc(100% + 62px)';
+                objTag.style.transform = 'none';
+                objTag.style.top = '-62px';
+            }
 
             modal.classList.add('active');
             document.body.classList.add('viewing-doc');
+
             const myPresenceRef = db.ref(`viewers/${currentDocId}/${currentUser.uid}`);
             myPresenceRef.set({
                 name: currentUser.displayName,
@@ -704,10 +798,11 @@
 
         function closeViewer() {
             const modal = document.getElementById('viewer-modal');
-            const iframe = document.getElementById('doc-frame');
+            const objTag = document.getElementById('doc-frame');
             modal.classList.remove('active');
             document.body.classList.remove('viewing-doc');
-            setTimeout(() => { iframe.src = ''; }, 400);
+            // Clear the data attribute
+            setTimeout(() => { objTag.setAttribute('data', ''); }, 400);
             if (currentUser && currentDocId) {
                 db.ref(`viewers/${currentDocId}/${currentUser.uid}`).remove();
             }
@@ -719,4 +814,3 @@
     </script>
 </body>
 </html>
-
