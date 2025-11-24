@@ -453,10 +453,14 @@
             position: absolute;
             top: -62px;
             left: 0;
-            width: 100%;
-            height: calc(100% + 62px);
             border: none;
             background: white;
+            /* 1. FORCE THE FRAME TO BE HUGE (Tricks Google to show Desktop UI) */
+            width: 250%; /* 2.5x wider than the screen */
+            height: 250%; /* 2.5x taller */
+            /* 2. SHRINK IT BACK DOWN TO FIT (Creates the "Zoomed Out" effect) */
+            transform: scale(0.4);
+            transform-origin: 0 0; /* Pin to top-left */
         }
 
         .loading-msg {
