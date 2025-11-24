@@ -1,0 +1,589 @@
+﻿<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="referrer" content="no-referrer">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lev's System // Secure Archive</title>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+
+    <script src="config.js"></script>
+
+    <style>
+        /* --- CORE THEME VARIABLES --- */
+        :root {
+            --term-green: #00ff41;
+            --term-dark-green: #008F11;
+            --term-bg: #0d0208;
+            --glass-bg: rgba(0, 20, 0, 0.85);
+            --border-glow: 0 0 10px rgba(0, 255, 65, 0.5);
+            --text-shadow: 0 0 5px rgba(0, 255, 65, 0.8);
+            --font-stack: 'Courier New', Courier, monospace;
+        }
+
+        body {
+            font-family: var(--font-stack);
+            background-color: black;
+            margin: 0;
+            padding: 0;
+            color: var(--term-green);
+            overflow-x: hidden;
+        }
+
+        /* MATRIX BACKGROUND */
+        canvas#matrix {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            width: 100%;
+            height: 100%;
+            opacity: 0.8;
+        }
+
+        /* CRT SCANLINE EFFECT */
+        body::after {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 99999;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+
+        /* --- LOGIN SCREEN --- */
+        #login-screen {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: transparent;
+            position: relative;
+            z-index: 10;
+        }
+
+            #login-screen h1 {
+                color: white;
+                font-size: 3.5rem;
+                margin-bottom: 30px;
+                text-transform: uppercase;
+                position: relative;
+                text-shadow: 0.05em 0 0 #00fffc, -0.03em -0.04em 0 #fc00ff, 0.025em 0.04em 0 #fffc00;
+                animation: glitch 725ms infinite;
+            }
+
+        @keyframes glitch {
+            0% {
+                text-shadow: 0.05em 0 0 #00fffc, -0.03em -0.04em 0 #fc00ff, 0.025em 0.04em 0 #fffc00;
+            }
+
+            50% {
+                text-shadow: 0.05em 0.035em 0 #00fffc, 0.03em 0 0 #fc00ff, 0 -0.04em 0 #fffc00;
+            }
+
+            100% {
+                text-shadow: -0.05em 0 0 #00fffc, -0.025em -0.04em 0 #fc00ff, -0.04em -0.025em 0 #fffc00;
+            }
+        }
+
+        button#google-login-btn {
+            background-color: black;
+            color: var(--term-green);
+            border: 2px solid var(--term-green);
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            font-family: var(--font-stack);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            box-shadow: var(--border-glow);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+            button#google-login-btn:hover {
+                background-color: var(--term-green);
+                color: black;
+                box-shadow: 0 0 20px var(--term-green);
+            }
+
+        /* --- APP HEADER --- */
+        #app {
+            display: none;
+            padding-bottom: 50px;
+            position: relative;
+            z-index: 10;
+        }
+
+        header {
+            background-color: rgba(0,0,0,0.9);
+            border-bottom: 2px solid var(--term-green);
+            color: var(--term-green);
+            padding: 40px 20px;
+            text-align: center;
+            box-shadow: var(--border-glow);
+            margin-bottom: 20px;
+        }
+
+            header h2 {
+                text-transform: uppercase;
+                letter-spacing: 4px;
+                margin: 10px 0;
+                text-shadow: var(--text-shadow);
+            }
+
+        /* --- HEART ANIMATION --- */
+        .lev-animation {
+            position: relative;
+            width: 100px;
+            height: 90px;
+            margin: 0 auto 20px auto;
+            animation: heartbeat 1.5s infinite;
+            filter: drop-shadow(0 0 10px red);
+        }
+
+            .lev-animation:before, .lev-animation:after {
+                position: absolute;
+                content: "";
+                left: 50px;
+                top: 0;
+                width: 50px;
+                height: 80px;
+                background: #ff0055;
+                border-radius: 50px 50px 0 0;
+                transform: rotate(-45deg);
+                transform-origin: 0 100%;
+                border: 2px solid white;
+            }
+
+            .lev-animation:after {
+                left: 0;
+                transform: rotate(45deg);
+                transform-origin: 100% 100%;
+            }
+
+        @keyframes heartbeat {
+            0% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+
+            14% {
+                transform: scale(1.1);
+                opacity: 1;
+                filter: drop-shadow(0 0 20px red);
+            }
+
+            28% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+
+            70% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+        }
+
+        /* --- GALLERY --- */
+        .gallery {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+            padding: 40px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: var(--glass-bg);
+            border: 1px solid var(--term-dark-green);
+            width: 240px;
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 0 5px rgba(0, 255, 65, 0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(5px);
+            position: relative;
+        }
+
+            .card::before {
+                content: "SECURE_FILE";
+                position: absolute;
+                top: 5px;
+                left: 5px;
+                font-size: 0.6rem;
+                opacity: 0.7;
+            }
+
+            .card:hover {
+                transform: translateY(-5px) scale(1.02);
+                box-shadow: 0 0 25px rgba(0, 255, 65, 0.6);
+                border-color: var(--term-green);
+                background: rgba(0, 40, 0, 0.9);
+            }
+
+        .card-preview {
+            height: 140px;
+            background-color: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: var(--term-green);
+            border-bottom: 1px solid var(--term-dark-green);
+        }
+
+        .card h3 {
+            margin: 15px 0 5px 0;
+            font-size: 1.1rem;
+            color: white;
+            text-transform: uppercase;
+        }
+
+        .card p {
+            color: var(--term-green);
+            font-size: 0.8rem;
+            padding: 0 10px 15px 10px;
+            opacity: 0.8;
+        }
+
+        .card.tba {
+            cursor: not-allowed;
+            opacity: 0.5;
+            background: rgba(50,50,50,0.5);
+            border-color: #555;
+        }
+
+            .card.tba p, .card.tba h3 {
+                color: #aaa;
+            }
+
+        .badge {
+            background: #333;
+            color: #fff;
+            padding: 2px 8px;
+            border: 1px solid #777;
+            font-size: 0.7rem;
+            vertical-align: middle;
+        }
+
+        /* --- VIEWER MODAL --- */
+        #viewer-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: black;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            transform: translateY(100%);
+            transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+            #viewer-modal.active {
+                transform: translateY(0);
+            }
+
+        .viewer-header {
+            height: 60px;
+            background: #111;
+            border-bottom: 2px solid var(--term-green);
+            color: var(--term-green);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            justify-content: space-between;
+            box-shadow: 0 5px 20px rgba(0, 255, 65, 0.2);
+            z-index: 10;
+        }
+
+        .viewers-list img {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 2px solid var(--term-green);
+            background: #000;
+            margin-left: 8px;
+            box-shadow: 0 0 10px var(--term-green);
+        }
+
+        .close-btn {
+            background: transparent;
+            border: 1px solid red;
+            color: red;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-weight: bold;
+            font-family: var(--font-stack);
+            text-transform: uppercase;
+            transition: all 0.2s;
+        }
+
+            .close-btn:hover {
+                background: red;
+                color: black;
+                box-shadow: 0 0 15px red;
+            }
+
+        .iframe-wrapper {
+            flex: 1;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        iframe#doc-frame {
+            position: absolute;
+            top: -62px;
+            left: 0;
+            width: 100%;
+            height: calc(100% + 62px);
+            border: none;
+            background: white;
+        }
+
+        .loading-msg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: var(--term-green);
+            font-size: 1.5rem;
+            animation: blink 1s infinite;
+            z-index: -1;
+        }
+
+        @keyframes blink {
+            50% {
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="matrix"></canvas>
+
+    <div id="login-screen">
+        <div class="lev-animation"></div>
+        <h1 data-text="הסיכומים של לב">הסיכומים של לב</h1>
+        <button id="google-login-btn">
+            [ ACCESS SYSTEM ]
+        </button>
+        <p style="margin-top: 15px; font-size: 0.8rem; letter-spacing: 2px; opacity: 0.7;">ENCRYPTED CONNECTION</p>
+    </div>
+
+    <div id="app">
+        <header>
+            <div class="lev-animation" style="transform: scale(0.6);"></div>
+            <h2>ARCHIVE // DATABASE</h2>
+            <p>USER: <span id="user-name-display" style="color:white; text-shadow: 0 0 5px white;">...</span> | <a href="#" onclick="logout()" style="color:red; text-decoration:none;">[ LOGOUT ]</a></p>
+        </header>
+
+        <div class="gallery" id="gallery-container">
+            <p style="text-align:center; width:100%;">FETCHING SECURE DATA...</p>
+        </div>
+    </div>
+
+    <div id="viewer-modal">
+        <div class="viewer-header">
+            <div style="display:flex; align-items:center;">
+                <button class="close-btn" onclick="closeViewer()">[ X ] CLOSE</button>
+                <span style="margin-right: 15px; font-weight: bold; letter-spacing: 1px;" id="doc-title-display">LOADING...</span>
+            </div>
+
+            <div style="display:flex; align-items:center;">
+                <span class="viewers-label" style="text-transform:uppercase; font-size:0.7rem;">Active:</span>
+                <div class="viewers-list" id="active-viewers">
+                </div>
+            </div>
+        </div>
+
+        <div class="loading-msg">DECRYPTING...</div>
+
+        <div class="iframe-wrapper">
+            <iframe id="doc-frame" src=""></iframe>
+        </div>
+    </div>
+
+    <script>
+        // --- MATRIX SCRIPT ---
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const alphabet = 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッンABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        const fontSize = 16;
+        const columns = canvas.width / fontSize;
+        const rainDrops = [];
+        for (let x = 0; x < columns; x++) { rainDrops[x] = 1; }
+        const draw = () => {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#0F0';
+            ctx.font = fontSize + 'px monospace';
+            for (let i = 0; i < rainDrops.length; i++) {
+                const text = alphabet.charAt(Math.floor(Math.random() * alphabet.length));
+                ctx.fillText(text, i * fontSize, rainDrops[i] * fontSize);
+                if (rainDrops[i] * fontSize > canvas.height && Math.random() > 0.975) { rainDrops[i] = 0; }
+                rainDrops[i]++;
+            }
+        };
+        setInterval(draw, 30);
+        window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
+
+        // --- FIREBASE INITIALIZATION ---
+        // שים לב! מחקנו מכאן את ה-Config כי הוא נמצא בקובץ config.js שטענו למעלה
+        try {
+            // הדפדפן מכיר את המשתמש firebaseConfig כי הוא הוגדר בקובץ השני
+            firebase.initializeApp(firebaseConfig);
+        } catch (e) { console.error(e); }
+
+        const auth = firebase.auth();
+        const db = firebase.database();
+
+        let currentUser = null;
+        let currentDocId = null;
+        let viewersListener = null;
+
+        const loginBtn = document.getElementById('google-login-btn');
+        loginBtn.addEventListener('click', () => {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            auth.signInWithPopup(provider).catch(error => {
+                alert("ACCESS DENIED: " + error.message);
+            });
+        });
+
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                currentUser = user;
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('app').style.display = 'block';
+                document.getElementById('user-name-display').innerText = user.displayName;
+                fetchSummariesFromDB();
+            } else {
+                currentUser = null;
+                document.getElementById('login-screen').style.display = 'flex';
+                document.getElementById('app').style.display = 'none';
+            }
+        });
+
+        function logout() {
+            auth.signOut();
+            location.reload();
+        }
+
+        function fetchSummariesFromDB() {
+            const galleryRef = db.ref('summaries');
+            galleryRef.once('value', (snapshot) => {
+                const container = document.getElementById('gallery-container');
+                container.innerHTML = '';
+
+                if (!snapshot.exists()) {
+                    container.innerHTML = '<p>NO DATA FOUND IN DATABASE.</p>';
+                    return;
+                }
+
+                snapshot.forEach((childSnapshot) => {
+                    const item = childSnapshot.val();
+                    renderCard(item, container);
+                });
+            });
+        }
+
+        function renderCard(item, container) {
+            const card = document.createElement('div');
+            card.className = `card ${item.tba ? 'tba' : ''}`;
+
+            const content = `
+                        <div class="card-preview">${item.icon || '📁'}</div>
+                        <h3>${item.title} ${item.tba ? '<span class="badge">LOCKED</span>' : ''}</h3>
+                        <p>${item.tba ? 'DATA CORRUPTED' : 'CLICK TO ACCESS'}</p>
+                    `;
+            card.innerHTML = content;
+
+            if (!item.tba) {
+                card.onclick = () => openViewer(item);
+            }
+            container.appendChild(card);
+        }
+
+        function openViewer(item) {
+            currentDocId = item.id;
+            document.getElementById('doc-title-display').innerText = "ACCESSING: " + item.title;
+            const modal = document.getElementById('viewer-modal');
+            const iframe = document.getElementById('doc-frame');
+
+            iframe.src = item.url;
+            modal.classList.add('active');
+
+            const myPresenceRef = db.ref(`viewers/${currentDocId}/${currentUser.uid}`);
+            myPresenceRef.set({
+                name: currentUser.displayName,
+                photo: currentUser.photoURL,
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            });
+
+            myPresenceRef.onDisconnect().remove();
+
+            const allViewersRef = db.ref(`viewers/${currentDocId}`);
+            viewersListener = allViewersRef.on('value', (snapshot) => {
+                const viewersDiv = document.getElementById('active-viewers');
+                viewersDiv.innerHTML = '';
+
+                if (snapshot.exists()) {
+                    const viewers = snapshot.val();
+                    Object.values(viewers).forEach(viewer => {
+                        const img = document.createElement('img');
+                        img.src = viewer.photo || 'https://via.placeholder.com/40';
+                        img.onerror = function () {
+                            this.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(viewer.name)}&background=random`;
+                        };
+                        img.title = viewer.name;
+                        viewersDiv.appendChild(img);
+                    });
+                }
+            });
+        }
+
+        function closeViewer() {
+            const modal = document.getElementById('viewer-modal');
+            const iframe = document.getElementById('doc-frame');
+
+            modal.classList.remove('active');
+            setTimeout(() => { iframe.src = ''; }, 400);
+
+            if (currentUser && currentDocId) {
+                db.ref(`viewers/${currentDocId}/${currentUser.uid}`).remove();
+            }
+
+            if (currentDocId) {
+                db.ref(`viewers/${currentDocId}`).off('value', viewersListener);
+            }
+
+            currentDocId = null;
+        }
+    </script>
+</body>
+</html>
