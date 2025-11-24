@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="referrer" content="no-referrer">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="1200", user-scalable=yes">
     <title>האתר של לב</title>
     <link rel="icon" type="image/x-icon" href="icon.png">
 
@@ -476,74 +476,7 @@
             }
         }
 
-        /* --- תיקונים למובייל (Mobile Responsive) --- */
-        @media (max-width: 768px) {
-
-            .viewer-header {
-                padding: 0 10px;
-                height: 50px;
-            }
-
-            #doc-title-display {
-                font-size: 0.8rem;
-                max-width: 100px;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-            }
-
-            .close-btn {
-                padding: 5px 10px;
-                font-size: 0.7rem;
-            }
-
-            .viewers-label {
-                display: none;
-            }
-
-            #active-viewers {
-                display: flex;
-            }
-
-            /* גודל ברירת מחדל לנייד */
-            .viewers-list img {
-                width: 28px;
-                height: 28px;
-                margin-left: 4px;
-            }
-
-            /* מחלקות דינמיות */
-            .viewers-list.dense img {
-                width: 24px;
-                height: 24px;
-                margin-left: -5px;
-            }
-
-            .viewers-list.super-dense img {
-                width: 18px;
-                height: 18px;
-                margin-left: -8px;
-                border-width: 1px;
-            }
-
-            /* תצוגת מובייל נקייה בלי חיתוך */
-            iframe#doc-frame {
-                top: 0;
-                height: 100%;
-            }
-
-            #logo-container {
-                top: 15px;
-                right: 15px;
-                transform: scale(0.8);
-            }
-
-            body.viewing-doc #logo-container {
-                top: 60px;
-                right: 10px;
-                z-index: 5;
-            }
-        }
+      
     </style>
 </head>
 <body>
@@ -723,17 +656,13 @@
             if (cleanUrl.includes('/view')) cleanUrl = cleanUrl.split('/view')[0];
             if (cleanUrl.includes('/preview')) cleanUrl = cleanUrl.split('/preview')[0];
 
-            const isMobile = window.innerWidth <= 768;
-            if (isMobile) {
-                // כאן השינוי ל-mobilebasic שפותר את הבעיה
-                iframe.src = cleanUrl + '/mobilebasic';
-            } else {
-                iframe.src = cleanUrl + '/preview';
-            }
+            // --- CHANGE START: Force Desktop Preview Always ---
+            // We removed the "if (isMobile)" check completely.
+            iframe.src = cleanUrl + '/preview';
+            // --- CHANGE END ---
 
             modal.classList.add('active');
             document.body.classList.add('viewing-doc');
-
             const myPresenceRef = db.ref(`viewers/${currentDocId}/${currentUser.uid}`);
             myPresenceRef.set({
                 name: currentUser.displayName,
